@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>The Alignment Veto — How Safety Training Suppresses Cultural Knowledge in LLMs</title>
+<style>
+  :root {
+    --bg: #080c1e;
+    --bg2: #0d1230;
+    --bg3: #111840;
+    --gold: #C8960C;
+    --gold-light: #F0B730;
+    --red: #c0392b;
+    --red-light: #e74c3c;
+    --teal: #1A8A6C;
+    --teal-light: #27AE60;
+    --blue: #2980b9;
+    --blue-light: #5B9BD5;
+    --purple: #8e44ad;
+    --text: #e8ecf4;
+    --text-muted: #8899b8;
+    --border: rgba(200,150,12,0.2);
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;line-height:1.7;overflow-x:hidden}
+
+  /* ── Canvas ── */
+  #starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.5}
+
+  /* ── Nav ── */
+  nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(8,12,30,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;gap:2rem;align-items:center}
+  nav .logo{font-size:.85rem;font-weight:700;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;font-family:monospace}
+  nav a{color:var(--text-muted);text-decoration:none;font-size:.8rem;letter-spacing:.05em;transition:color .2s;font-family:sans-serif}
+  nav a:hover{color:var(--gold-light)}
+
+  /* ── Sections ── */
+  section{position:relative;z-index:1;padding:6rem 2rem}
+  .container{max-width:920px;margin:0 auto}
+  .wide{max-width:1200px;margin:0 auto}
+
+  /* ── Hero ── */
+  #hero{min-height:100vh;display:flex;align-items:center;padding-top:80px}
+  .hero-label{font-family:monospace;font-size:.75rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
+  h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.15;font-weight:700;margin-bottom:1.5rem}
+  h1 .veto{color:var(--red-light);font-style:italic}
+  .hero-sub{font-size:1.1rem;color:var(--text-muted);max-width:680px;margin-bottom:2.5rem}
+  .authors{font-size:.9rem;color:var(--text-muted);margin-bottom:2.5rem}
+  .btn-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3rem}
+  .btn{padding:.6rem 1.5rem;border-radius:4px;text-decoration:none;font-size:.85rem;font-family:sans-serif;letter-spacing:.05em;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem}
+  .btn-primary{background:var(--gold);color:#0a0e1a;font-weight:700}
+  .btn-primary:hover{background:var(--gold-light)}
+  .btn-outline{border:1px solid var(--gold);color:var(--gold)}
+  .btn-outline:hover{background:rgba(200,150,12,.1)}
+  .btn-hf{border:1px solid var(--blue-light);color:var(--blue-light)}
+  .btn-hf:hover{background:rgba(91,155,213,.1)}
+
+  /* ── Stat cards ── */
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem}
+  .stat-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:1.25rem 1rem;text-align:center}
+  .stat-num{font-size:2rem;font-weight:700;color:var(--gold-light);display:block;font-family:sans-serif}
+  .stat-label{font-size:.75rem;color:var(--text-muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem}
+
+  /* ── Section headers ── */
+  h2{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:.75rem;line-height:1.2}
+  h2 .accent{color:var(--gold)}
+  h2 .red{color:var(--red-light)}
+  .section-lead{font-size:1.05rem;color:var(--text-muted);margin-bottom:2.5rem;max-width:700px}
+  h3{font-size:1.1rem;font-weight:700;margin-bottom:.75rem;color:var(--gold-light)}
+
+  /* ── Divider ── */
+  .divider{width:60px;height:3px;background:var(--gold);margin-bottom:1.5rem;border-radius:2px}
+
+  /* ── Veto Animation ── */
+  #veto-demo{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:3rem}
+  #veto-canvas-wrap{position:relative;height:340px;overflow:hidden;border-radius:8px;background:var(--bg)}
+  #veto-canvas{width:100%;height:100%}
+  .veto-legend{display:flex;gap:2rem;justify-content:center;margin-top:1rem;font-size:.8rem;font-family:sans-serif;flex-wrap:wrap}
+  .veto-legend span{display:flex;align-items:center;gap:.4rem;color:var(--text-muted)}
+  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+
+  /* ── Two-column ── */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
+  @media(max-width:640px){.two-col{grid-template-columns:1fr}}
+  .card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
+  .card.red-border{border-color:rgba(192,57,43,.5)}
+  .card.teal-border{border-color:rgba(26,138,108,.5)}
+  .card-tag{font-size:.7rem;font-family:monospace;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
+  .red-tag{color:var(--red-light)}
+  .teal-tag{color:var(--teal-light)}
+  ul{padding-left:1.2rem;color:var(--text-muted);font-family:sans-serif;font-size:.9rem}
+  ul li{margin-bottom:.4rem}
+
+  /* ── Safety Tax bars ── */
+  .bar-chart{margin:2rem 0}
+  .bar-row{display:flex;align-items:center;margin-bottom:.6rem;gap:.75rem}
+  .bar-label{width:180px;font-size:.8rem;font-family:monospace;color:var(--text-muted);text-align:right;flex-shrink:0}
+  .bar-track{flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;position:relative}
+  .bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1);width:0}
+  .bar-val{font-size:.75rem;font-family:monospace;color:var(--text-muted);width:50px;flex-shrink:0}
+
+  /* ── Country grid ── */
+  .country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin:2rem 0}
+  .country-card{border-radius:8px;padding:.75rem;font-family:sans-serif;font-size:.78rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
+  .country-card:hover{transform:translateY(-2px)}
+  .country-name{font-weight:600;margin-bottom:.25rem}
+  .country-score{font-size:1.1rem;font-weight:700}
+  .country-bar{height:4px;border-radius:2px;margin-top:.5rem}
+
+  /* ── Language section ── */
+  .lang-demo{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-top:2rem}
+  #lang-canvas-wrap{height:280px;position:relative;border-radius:8px;background:var(--bg);overflow:hidden}
+  #lang-canvas{width:100%;height:100%}
+
+  /* ── SAE section ── */
+  .sae-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:2rem 0}
+  @media(max-width:600px){.sae-grid{grid-template-columns:1fr}}
+  .sae-card{background:rgba(255,255,255,0.03);border-radius:10px;padding:1.5rem;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
+  .sae-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
+  .sae-t1::after{background:var(--teal)}
+  .sae-t2::after{background:var(--blue)}
+  .sae-t3::after{background:var(--red)}
+  .sae-pct{font-size:2.5rem;font-weight:700;display:block;margin:.5rem 0;font-family:sans-serif}
+  .sae-desc{font-size:.8rem;color:var(--text-muted);font-family:sans-serif}
+
+  /* ── Framing table ── */
+  table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:.88rem;margin:1.5rem 0}
+  th{text-align:left;color:var(--gold);font-weight:600;padding:.6rem .8rem;border-bottom:1px solid var(--border);font-size:.8rem;text-transform:uppercase;letter-spacing:.07em}
+  td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-muted);vertical-align:middle}
+  tr:hover td{background:rgba(255,255,255,.02)}
+  .highlight-row td{color:var(--text);font-weight:600}
+  .tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.7rem;font-weight:600;font-family:monospace}
+  .tag-best{background:rgba(26,138,108,.2);color:var(--teal-light);border:1px solid rgba(26,138,108,.3)}
+  .tag-worst{background:rgba(192,57,43,.2);color:var(--red-light);border:1px solid rgba(192,57,43,.3)}
+
+  /* ── Mechanism section ── */
+  .mechanism-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2rem 0}
+  .step{background:rgba(255,255,255,.03);border-radius:10px;padding:1.25rem;border:1px solid var(--border)}
+  .step-num{font-size:2rem;font-weight:700;color:var(--gold);opacity:.4;display:block;font-family:sans-serif;line-height:1}
+  .step-title{font-size:.9rem;font-weight:700;margin:.25rem 0}
+  .step-body{font-size:.82rem;color:var(--text-muted);font-family:sans-serif}
+
+  /* ── Interactive probe vis ── */
+  #probe-canvas-wrap{height:300px;background:var(--bg);border-radius:8px;position:relative;overflow:hidden;margin-top:1.5rem}
+  #probe-canvas{width:100%;height:100%}
+
+  /* ── Quote ── */
+  blockquote{border-left:3px solid var(--gold);padding:1rem 1.5rem;margin:2rem 0;color:var(--text-muted);font-style:italic;font-size:1.05rem;background:rgba(200,150,12,.05);border-radius:0 8px 8px 0}
+
+  /* ── BibTeX ── */
+  pre{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;padding:1.5rem;font-size:.82rem;color:var(--text-muted);overflow-x:auto;font-family:monospace;line-height:1.6}
+
+  /* ── Footer ── */
+  footer{background:var(--bg2);border-top:1px solid var(--border);padding:2.5rem;text-align:center;font-family:sans-serif;font-size:.8rem;color:var(--text-muted);position:relative;z-index:1}
+  footer a{color:var(--gold);text-decoration:none}
+
+  /* ── Scroll animations ── */
+  .fade-in{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+  .fade-in.visible{opacity:1;transform:translateY(0)}
+
+  /* ── Tooltip ── */
+  [data-tip]{position:relative;cursor:help}
+  [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:var(--text);font-size:.75rem;white-space:nowrap;padding:.4rem .75rem;border-radius:4px;z-index:200;pointer-events:none;font-family:sans-serif;border:1px solid var(--border)}
+
+  .alt-bg{background:rgba(13,18,48,.6)}
+</style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+
+<nav>
+  <span class="logo">Alignment Veto</span>
+  <a href="#concept">Concept</a>
+  <a href="#findings">Findings</a>
+  <a href="#countries">Equity</a>
+  <a href="#language">Language</a>
+  <a href="#mechanism">Mechanism</a>
+  <a href="#data">Data</a>
+  <a href="#cite">Cite</a>
+</nav>
+
+<!-- ══════════════════════════════ HERO ══════════════════════════════ -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-label">ACL 2026</div>
+    <h1>
+      The <span class="veto">Alignment Veto:</span><br/>
+      How Safety Training Suppresses<br/>Cultural Knowledge in LLMs
+    </h1>
+    <p class="authors">Pardis Sadat Zahraei &nbsp;·&nbsp; Nizi Nazar &nbsp;·&nbsp; Ehsaneddin Asgari</p>
+    <p class="hero-sub">
+      Across 16 MENA countries, 26 models, and 1.53M human survey responses, we show
+      that when a model refuses a culturally sensitive question, the knowledge is
+      <strong>suppressed — not erased.</strong> The model's internal logits at refusal
+      correlate with human data more than its freely generated answers.
+    </p>
+    <div class="btn-row">
+      <a href="#" class="btn btn-primary">📄 Paper (arXiv)</a>
+      <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" class="btn btn-hf">🤗 Dataset</a>
+      <a href="https://github.com/pardissz/alignment-veto" class="btn btn-outline">💻 GitHub</a>
+    </div>
+    <div class="stats-grid fade-in">
+      <div class="stat-card">
+        <span class="stat-num" data-target="26">0</span>
+        <div class="stat-label">Models Evaluated</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" data-target="16">0</span>
+        <div class="stat-label">MENA Countries</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" data-target="864">0</span>
+        <div class="stat-label">Survey Questions</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" data-target="1530000" data-suffix="M">0</span>
+        <div class="stat-label">Human Survey Responses</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" data-target="376" data-pct="1">0</span>
+        <div class="stat-label">Max Safety Tax</div>
+      </div>
+      <div class="stat-card">
+        <span class="stat-num" data-target="198" data-pct="1">0</span>
+        <div class="stat-label">Country Equity Gap</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ CONCEPT ══════════════════════════════ -->
+<section id="concept" class="alt-bg">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>The <span class="red">Alignment Veto</span></h2>
+    <p class="section-lead">
+      Standard assumption: a refused question means missing knowledge.<br/>
+      Our finding: the knowledge is <em>present</em> — but blocked.
+    </p>
+
+    <div id="veto-demo" class="fade-in">
+      <p style="font-size:.85rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem;text-align:center">
+        Live animation — watch what happens inside the model vs. what comes out
+      </p>
+      <div id="veto-canvas-wrap">
+        <canvas id="veto-canvas"></canvas>
+      </div>
+      <div class="veto-legend">
+        <span><span class="dot" style="background:var(--teal)"></span>Internal logits at refusal</span>
+        <span><span class="dot" style="background:var(--red)"></span>Expressed answer</span>
+        <span><span class="dot" style="background:var(--gold)"></span>Human survey ground truth</span>
+        <span><span class="dot" style="background:var(--blue)"></span>Alignment gate</span>
+      </div>
+    </div>
+
+    <div class="two-col fade-in">
+      <div class="card red-border">
+        <div class="card-tag red-tag">⛔ Suppression Failure</div>
+        <h3>Knowledge is present, blocked at output</h3>
+        <ul>
+          <li>Model refuses the question</li>
+          <li>Internal logit distribution aligns with human data</li>
+          <li>Safety gate intercepts at generation time</li>
+          <li>Addressable with third-person framing or DPO curation</li>
+          <li>Dominant in T3 LGBTQ+ questions</li>
+        </ul>
+      </div>
+      <div class="card teal-border">
+        <div class="card-tag teal-tag">📉 Representational Bias</div>
+        <h3>Knowledge encoding itself is off</h3>
+        <ul>
+          <li>Model answers freely</li>
+          <li>Output diverges from human survey data</li>
+          <li>No generation-time gate to bypass</li>
+          <li>Requires MENA-specific training data</li>
+          <li>Dominant in gender equality questions</li>
+        </ul>
+      </div>
+    </div>
+
+    <blockquote>
+      The model's internal logit distributions at the moment of refusal correlate
+      with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers on
+      non-refused items — refused T3 EV-NVAS 0.718 vs. accepted T3 NVAS 0.690 (Δ=+0.029, p&lt;10⁻¹³).
+    </blockquote>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ FINDINGS ══════════════════════════════ -->
+<section id="findings">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>The Safety <span class="accent">Tax</span></h2>
+    <p class="section-lead">
+      Instruction-tuned models refuse T3 sensitive questions at 23.9% vs. 12.4% for benign T1 questions —
+      a +11.5% safety tax (Cohen's d=0.303, p&lt;10⁻¹¹⁵). The distribution is highly unequal.
+    </p>
+
+    <div class="bar-chart fade-in" id="tax-chart">
+      <h3 style="margin-bottom:1.5rem">Safety Tax by Model (T3 − T1 refusal rate)</h3>
+    </div>
+
+    <div class="two-col fade-in" style="margin-top:2rem">
+      <div class="card">
+        <h3>Scale does not predict the tax</h3>
+        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
+          Spearman ρ=0.147 (p=0.464) between parameter count and safety tax.
+          OLMo-32B-IT: 25.3% tax. GPT-5: −2.9% tax.
+          Size is irrelevant; alignment pipeline is what matters.
+        </p>
+      </div>
+      <div class="card">
+        <h3>DPO stage installs the tax</h3>
+        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
+          Within OLMo-3 and Tulu-3 families, safety tax increases monotonically:
+          Base → SFT → DPO → IT (p&lt;0.05 within-family, paired).
+          DPO adds suppression; IT adds more.
+        </p>
+      </div>
+    </div>
+
+    <div class="fade-in" style="margin-top:2.5rem">
+      <h3>Framing Comparison (19 instruct models, T3 questions)</h3>
+      <table>
+        <thead>
+          <tr><th>Framing</th><th>T3 Refusal Rate</th><th>Mean NVAS</th><th></th></tr>
+        </thead>
+        <tbody>
+          <tr><td>No-Mention-EN</td><td>22.3%</td><td>—</td><td></td></tr>
+          <tr><td>Persona-EN</td><td>24.3%</td><td>0.684</td><td></td></tr>
+          <tr><td>Persona-Native</td><td>16.2%</td><td>0.665</td><td></td></tr>
+          <tr class="highlight-row"><td><strong>Third-EN ✦</strong></td><td><strong>17.6%</strong></td><td><strong>0.694</strong></td><td><span class="tag tag-best">Best</span></td></tr>
+          <tr><td>Third-Native</td><td>16.4%</td><td>0.661</td><td></td></tr>
+        </tbody>
+      </table>
+      <p style="font-size:.82rem;color:var(--text-muted);font-family:sans-serif">
+        Third/Observer framing provides <strong style="color:var(--text)">2.6× the NVAS benefit</strong> of Persona on T3 (+0.081 vs +0.031 relative to No-Mention).
+        Note: Third-EN also increases JSD (distributional spread) from 0.435 → 0.451 — a NVAS/JSD trade-off.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ COUNTRIES ══════════════════════════════ -->
+<section id="countries" class="alt-bg">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>The Gate Is <span class="red">Inequitable</span></h2>
+    <p class="section-lead">
+      A 19.8% alignment-quality gap separates best- and worst-served nations.
+      Hover cards for details.
+    </p>
+
+    <div class="country-grid fade-in" id="country-grid"></div>
+
+    <p style="font-size:.85rem;color:var(--text-muted);font-family:sans-serif;margin-top:1rem">
+      Color scale: <span style="color:var(--red-light)">red</span> = low T3 NVAS (worst-served) →
+      <span style="color:var(--teal-light)">teal</span> = high T3 NVAS (best-served).
+      Palestine has highest T3 NVAS (0.731) <em>and</em> highest T3 refusal (0.352) —
+      consistent with the alignment veto: accurate internal representation, high suppression.
+    </p>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ LANGUAGE ══════════════════════════════ -->
+<section id="language">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>Native Language <span class="red">Hurts</span></h2>
+    <p class="section-lead">
+      Switching from English to Arabic/Persian/Turkish drops mean NVAS by −0.050 points
+      consistently across all 26 models — including Arabic-specialized models.
+    </p>
+
+    <div class="lang-demo fade-in">
+      <p style="font-size:.8rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem;text-align:center">
+        PCA visualization: Arabic prompting collapses 14 distinct country identities into one cluster
+      </p>
+      <div id="lang-canvas-wrap">
+        <canvas id="lang-canvas"></canvas>
+      </div>
+    </div>
+
+    <div class="two-col fade-in" style="margin-top:2rem">
+      <div class="card">
+        <h3>Language penalty breakdown</h3>
+        <table>
+          <thead><tr><th>Language</th><th>NVAS loss</th></tr></thead>
+          <tbody>
+            <tr><td>Arabic</td><td style="color:var(--gold)">−0.024</td></tr>
+            <tr><td>Persian</td><td style="color:var(--red-light)">−0.064</td></tr>
+            <tr><td>Turkish</td><td style="color:var(--red-light)">−0.064</td></tr>
+            <tr><td><strong>Mean</strong></td><td style="color:var(--red-light)"><strong>−0.050</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <h3>Arabic country collapse</h3>
+        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
+          Under Arabic prompting, 14 Arabic-speaking countries receive identical responses
+          for <strong style="color:var(--text)">66.5%</strong> of questions (vs 46.5% in English).
+          Within-group σ falls by <strong style="color:var(--text)">33.5%</strong> under Observer framing.
+          Language script, not country identity, drives the answer.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ MECHANISM ══════════════════════════════ -->
+<section id="mechanism" class="alt-bg">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>Mechanistic <span class="accent">Evidence</span></h2>
+    <p class="section-lead">
+      SAE analysis in Tulu-3-8B identifies a candidate DPO-stage feature that selectively
+      gates T3 sensitive content with no collateral effect on benign content.
+    </p>
+
+    <div class="sae-grid fade-in">
+      <div class="sae-card sae-t1">
+        <div class="card-tag teal-tag">T1 — Benign</div>
+        <span class="sae-pct" style="color:var(--teal-light)" data-target-pct="0">0%</span>
+        <div class="sae-desc">Veto feature activation<br/>0 of 40 seeds fire on T1</div>
+      </div>
+      <div class="sae-card sae-t2">
+        <div class="card-tag" style="color:var(--blue-light)">T2 — Moderate</div>
+        <span class="sae-pct" style="color:var(--blue-light)" data-target-pct="0.4">&lt;0.4%</span>
+        <div class="sae-desc">Veto feature activation<br/>Very rare; near-zero</div>
+      </div>
+      <div class="sae-card sae-t3">
+        <div class="card-tag red-tag">T3 — Sensitive</div>
+        <span class="sae-pct" style="color:var(--red-light)" data-target-pct="28.6">0%</span>
+        <div class="sae-desc">Veto feature activation<br/><strong>70× ratio vs T2</strong></div>
+      </div>
+    </div>
+
+    <div class="mechanism-steps fade-in">
+      <div class="step">
+        <span class="step-num">01</span>
+        <div class="step-title">TopK SAE Training</div>
+        <div class="step-body">F=8192 features, K=32, trained on layer-17 residual-stream activations of Tulu-3-8B-IT</div>
+      </div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <div class="step-title">T3-Selective Feature</div>
+        <div class="step-body">F1=0.39–0.46 selectivity; 28.6% T3 activation rate, &lt;0.4% T2, 0% T1 (70× ratio)</div>
+      </div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <div class="step-title">Ablation Effect</div>
+        <div class="step-body">Zeroing the feature: ΔŷT3 = +0.250 (p=0.016) across 20 seeds. ΔŷT1 = 0.000 in all 40 seeds</div>
+      </div>
+      <div class="step">
+        <span class="step-num">04</span>
+        <div class="step-title">DPO Installs It</div>
+        <div class="step-body">DPO result stronger (p=0.003) than IT (p=0.016). Suppression circuit present before IT stage</div>
+      </div>
+      <div class="step">
+        <span class="step-num">05</span>
+        <div class="step-title">36.9σ Outlier</div>
+        <div class="step-body">Ablating 50 random features: mean Δ=0.000±0.001. The veto feature is a 36.9σ outlier (p&lt;10⁻⁴)</div>
+      </div>
+    </div>
+
+    <div class="fade-in" style="margin-top:2rem">
+      <h3>Residualized Probing: Late-Layer Inversion</h3>
+      <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem">
+        Probing for cross-country cultural variation after subtracting per-question means
+        reveals a two-phase trajectory in Tulu-3-8B, OLMo-7B, and LLaMA-8B:
+      </p>
+      <div id="probe-canvas-wrap">
+        <canvas id="probe-canvas"></canvas>
+      </div>
+      <div style="display:flex;gap:2rem;justify-content:center;margin-top:.75rem;font-size:.8rem;font-family:sans-serif;color:var(--text-muted);flex-wrap:wrap">
+        <span><span class="dot" style="background:var(--teal)"></span> Early layers (2–3): cultural info enters (R²=+0.06 to +0.14)</span>
+        <span><span class="dot" style="background:var(--red)"></span> Late layers (28–31): alignment counteracts it (R² turns negative)</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ DATA ══════════════════════════════ -->
+<section id="data">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>Data &amp; <span class="accent">Code</span></h2>
+    <p class="section-lead">All model responses, code, and analysis scripts will be publicly released.</p>
+
+    <div class="two-col fade-in">
+      <div class="card">
+        <div class="card-tag" style="color:var(--blue-light)">🤗 HuggingFace Dataset</div>
+        <h3><a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" style="color:var(--gold-light);text-decoration:none">alignment-veto-responses</a></h3>
+        <ul>
+          <li>~1.53M model responses</li>
+          <li>26 open models × 864 questions</li>
+          <li>16 countries × 6 framings</li>
+          <li>NVAS, EV-NVAS, refusal labels</li>
+          <li>English + Arabic/Persian/Turkish</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-tag" style="color:var(--text-muted)">💻 GitHub Repository</div>
+        <h3><a href="https://github.com/pardissz/alignment-veto" style="color:var(--gold-light);text-decoration:none">pardissz/alignment-veto</a></h3>
+        <ul>
+          <li>Analysis scripts (run_*.py)</li>
+          <li>SAE implementation (TopK)</li>
+          <li>Probing pipeline</li>
+          <li>Figure generation</li>
+          <li>Framing condition templates</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="fade-in" style="margin-top:2rem">
+      <h3>Quick Start</h3>
+      <pre>from datasets import load_dataset
+
+ds = load_dataset("PardisSzah/alignment-veto-responses")
+# Columns: model, country, framing, language, tier, question,
+#          response, refused, nvas, ev_nvas, human_mean</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════ CITE ══════════════════════════════ -->
+<section id="cite" class="alt-bg">
+  <div class="container">
+    <div class="divider"></div>
+    <h2>Citation</h2>
+    <pre>@article{zahraei2026alignmentveto,
+  title     = {The Alignment Veto: How Safety Training Suppresses Cultural Knowledge in LLMs},
+  author    = {Zahraei, Pardis Sadat and Nazar, Nizi and Asgari, Ehsaneddin},
+  journal   = {arXiv preprint},
+  year      = {2026}
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <p>The Alignment Veto &nbsp;·&nbsp; 2026 &nbsp;·&nbsp;
+    <a href="https://github.com/pardissz/alignment-veto">GitHub</a> &nbsp;·&nbsp;
+    <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses">HuggingFace</a>
+  </p>
+</footer>
+
+<!-- ══════════════════════════════ SCRIPTS ══════════════════════════════ -->
+<script>
+/* ── Starfield ── */
+(function(){
+  const c=document.getElementById('starfield'),ctx=c.getContext('2d');
+  let W,H,stars=[];
+  function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
+  function mkStars(){stars=Array.from({length:200},()=>({
+    x:Math.random()*W,y:Math.random()*H,
+    r:Math.random()*1.2+.3,
+    s:Math.random()*.3+.1,
+    o:Math.random()*.7+.3
+  }))}
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    stars.forEach(s=>{
+      s.o+=s.s*.01;if(s.o>1||s.o<.3)s.s*=-1;
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);
+      ctx.fillStyle=`rgba(200,180,100,${s.o})`;ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  resize();mkStars();draw();
+  window.addEventListener('resize',()=>{resize();mkStars()});
+})();
+
+/* ── Fade-in observer ── */
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
+},{threshold:.1});
+document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
+
+/* ── Counter animation ── */
+function animateCounters(){
+  document.querySelectorAll('[data-target]').forEach(el=>{
+    const target=+el.dataset.target;
+    const pct=el.dataset.pct;
+    const suffix=el.dataset.suffix;
+    let start=null;
+    const dur=1800;
+    function step(ts){
+      if(!start)start=ts;
+      const p=Math.min((ts-start)/dur,1);
+      const ease=1-Math.pow(1-p,3);
+      let val=Math.round(target*ease);
+      if(suffix==='M') el.textContent=(val/1000000).toFixed(2)+'M';
+      else if(pct) el.textContent=(val/10).toFixed(1)+'%';
+      else el.textContent=val.toLocaleString();
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  });
+}
+const statsObserver=new IntersectionObserver(entries=>{
+  if(entries[0].isIntersecting){animateCounters();statsObserver.disconnect()}
+},{threshold:.3});
+statsObserver.observe(document.querySelector('.stats-grid'));
+
+/* ── Veto Canvas Animation ── */
+(function(){
+  const canvas=document.getElementById('veto-canvas');
+  const wrap=document.getElementById('veto-canvas-wrap');
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
+  resize();window.addEventListener('resize',resize);
+
+  /* Color palette */
+  const C={teal:'#1A8A6C',red:'#c0392b',gold:'#C8960C',blue:'#2980b9',muted:'rgba(136,153,184,0.5)'};
+
+  function drawGaussian(ctx,cx,cy,sigma,amplitude,color,label){
+    ctx.beginPath();
+    for(let x=cx-sigma*3.5;x<=cx+sigma*3.5;x+=.5){
+      const y=cy-amplitude*Math.exp(-0.5*((x-cx)/sigma)**2);
+      x===cx-sigma*3.5?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
+    if(label){
+      ctx.fillStyle=color;ctx.font='11px sans-serif';ctx.textAlign='center';
+      ctx.fillText(label,cx,cy-amplitude-10);
+    }
+  }
+
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    t+=.012;
+
+    const midY=H/2;
+    const gateX=W*.55;
+    const sigma=W*.045;
+
+    /* Background regions */
+    ctx.fillStyle='rgba(26,138,108,0.04)';
+    ctx.fillRect(0,0,gateX,H);
+    ctx.fillStyle='rgba(192,57,43,0.04)';
+    ctx.fillRect(gateX,0,W-gateX,H);
+
+    /* Labels */
+    ctx.font='11px monospace';ctx.fillStyle='rgba(136,153,184,0.6)';
+    ctx.textAlign='center';
+    ctx.fillText('INTERNAL REPRESENTATIONS',gateX*.5,22);
+    ctx.fillText('EXPRESSED OUTPUT',gateX+(W-gateX)*.5,22);
+
+    /* Gate */
+    const gateFlicker=.85+.15*Math.sin(t*3);
+    ctx.fillStyle=`rgba(41,128,185,${gateFlicker*.4})`;
+    ctx.fillRect(gateX-4,H*.1,8,H*.8);
+    ctx.fillStyle=`rgba(41,128,185,${gateFlicker})`;
+    ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ALIGNMENT',gateX,H*.1-14);
+    ctx.fillText('GATE',gateX,H*.1-2);
+
+    /* Internal distribution — teal, close to gold (human) */
+    const internalOffset=25*Math.sin(t*.2);
+    const humanCenter=gateX*.38;
+    const humanX=humanCenter;
+
+    /* Human ground truth — gold */
+    drawGaussian(ctx,humanX,midY+10,sigma*.9,H*.25,C.gold,'Human Survey');
+
+    /* Internal logits — teal, slightly shifted */
+    const intShift=8*Math.sin(t*.15);
+    drawGaussian(ctx,humanX+intShift,midY+10,sigma,H*.22,C.teal,'Internal Logits');
+
+    /* Expressed answer — red, far from human */
+    const outputX=gateX+(W-gateX)*.45;
+    const expressedShift=W*.12*Math.sin(t*.1+1);
+    drawGaussian(ctx,outputX+expressedShift,midY+10,sigma*.85,H*.2,C.red,'Expressed Answer');
+
+    /* Animated particles representing signal being blocked */
+    for(let i=0;i<6;i++){
+      const phase=t+i*1.05;
+      const px=humanX + (gateX-humanX-20)*((phase % 2)/2);
+      const py=midY+20+Math.sin(phase*4+i)*20;
+      const alpha=1-((phase%2)/2);
+      if(px<gateX-15){
+        ctx.beginPath();ctx.arc(px,py,3,0,6.28);
+        ctx.fillStyle=`rgba(26,138,108,${alpha*.8})`;ctx.fill();
+      }
+    }
+
+    /* Blocked signal flash at gate */
+    const blockAlpha=.4+.3*Math.sin(t*4);
+    ctx.beginPath();ctx.arc(gateX,midY,16,0,6.28);
+    ctx.strokeStyle=`rgba(41,128,185,${blockAlpha})`;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillStyle=`rgba(41,128,185,${blockAlpha+.2})`;
+    ctx.fillText('⊘',gateX,midY+6);
+
+    /* Correlation annotation */
+    ctx.fillStyle='rgba(200,150,12,0.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Internal ≈ Human (r>0, p<10⁻¹³)',humanX,H-18);
+
+    ctx.fillStyle='rgba(192,57,43,0.7)';ctx.textAlign='center';
+    ctx.fillText('Output skews Western defaults',outputX,H-18);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ── Safety Tax Bar Chart ── */
+(function(){
+  const data=[
+    {label:'ALLAM-7B-IT',    val:37.6,color:'#c0392b'},
+    {label:'OLMo-32B-IT',    val:25.3,color:'#e74c3c'},
+    {label:'Tulu-3.1-8B',    val:18.1,color:'#e67e22'},
+    {label:'LLaMA-3.1-8B-IT',val:14.2,color:'#f39c12'},
+    {label:'Gemma-3-27B-IT', val:13.0,color:'#f1c40f'},
+    {label:'AYA-32B',        val:11.5,color:'#d4ac0d'},
+    {label:'Qwen2.5-7B-IT',  val: 8.3,color:'#27ae60'},
+    {label:'GPT-4o-mini',    val: 6.1,color:'#1abc9c'},
+    {label:'GPT-5',          val:-2.9,color:'#16a085'},
+  ];
+  const chart=document.getElementById('tax-chart');
+  data.forEach(d=>{
+    const maxPos=40;
+    const pct=Math.max(d.val,0)/maxPos*100;
+    const row=document.createElement('div');row.className='bar-row';
+    row.innerHTML=`<div class="bar-label">${d.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="background:${d.color}" data-width="${pct}%"></div></div>
+      <div class="bar-val" style="color:${d.color}">${d.val>0?'+':''}${d.val}%</div>`;
+    chart.appendChild(row);
+  });
+  const barObs=new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting){
+      document.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.width});
+      barObs.disconnect();
+    }
+  },{threshold:.3});
+  barObs.observe(chart);
+})();
+
+/* ── Country grid ── */
+(function(){
+  const countries=[
+    {name:'Palestine',nvas:0.731,refusal:0.352},
+    {name:'Turkey',   nvas:0.718,refusal:0.195},
+    {name:'Iran',     nvas:0.712,refusal:0.288},
+    {name:'Tunisia',  nvas:0.709,refusal:0.241},
+    {name:'Jordan',   nvas:0.707,refusal:0.313},
+    {name:'Morocco',  nvas:0.703,refusal:0.261},
+    {name:'Egypt',    nvas:0.698,refusal:0.225},
+    {name:'Kuwait',   nvas:0.695,refusal:0.279},
+    {name:'Iraq',     nvas:0.692,refusal:0.304},
+    {name:'Lebanon',  nvas:0.688,refusal:0.271},
+    {name:'Libya',    nvas:0.674,refusal:0.248},
+    {name:'Sudan',    nvas:0.651,refusal:0.292},
+    {name:'Qatar',    nvas:0.641,refusal:0.335},
+    {name:'Saudi Arabia',nvas:0.629,refusal:0.319},
+    {name:'Mauritania',nvas:0.587,refusal:0.268},
+    {name:'Algeria',  nvas:0.532,refusal:0.242},
+  ];
+
+  function nvasColor(v){
+    /* 0.53 → red, 0.73 → teal */
+    const t=(v-0.52)/(0.74-0.52);
+    const r=Math.round(192+(26-192)*t);
+    const g=Math.round(57+(138-57)*t);
+    const b=Math.round(43+(108-43)*t);
+    return `rgb(${r},${g},${b})`;
+  }
+
+  const grid=document.getElementById('country-grid');
+  countries.forEach(c=>{
+    const col=nvasColor(c.nvas);
+    const card=document.createElement('div');
+    card.className='country-card';
+    card.style.background=`rgba(${c.nvas>0.65?'26,138,108':'192,57,43'},.08)`;
+    card.style.border=`1px solid ${col}44`;
+    const best=c.name==='Palestine',worst=c.name==='Algeria';
+    card.innerHTML=`
+      <div class="country-name">${c.name} ${best?'<span class="tag tag-best">Best</span>':worst?'<span class="tag tag-worst">Worst</span>':''}
+      </div>
+      <div class="country-score" style="color:${col}">${c.nvas.toFixed(3)}</div>
+      <div class="country-bar" style="background:${col};width:${((c.nvas-0.5)/(0.75-0.5)*100).toFixed(0)}%"></div>
+      <div style="font-size:.7rem;color:rgba(136,153,184,.7);font-family:sans-serif;margin-top:.3rem">refusal: ${(c.refusal*100).toFixed(1)}%</div>
+    `;
+    grid.appendChild(card);
+  });
+})();
+
+/* ── Language PCA canvas ── */
+(function(){
+  const canvas=document.getElementById('lang-canvas');
+  const wrap=document.getElementById('lang-canvas-wrap');
+  const ctx=canvas.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
+  resize();window.addEventListener('resize',resize);
+
+  const arabicCountries=['Algeria','Egypt','Iraq','Jordan','Kuwait','Lebanon',
+    'Libya','Mauritania','Morocco','Palestine','Qatar','Saudi Arabia','Sudan','Tunisia'];
+  const seeds=[.2,.5,.8,.15,.65,.35,.9,.45,.7,.25,.55,.3,.75,.4];
+
+  /* English: spread across space */
+  const engPositions=arabicCountries.map((_,i)=>{
+    const angle=(i/14)*Math.PI*1.8+.3;
+    const r=.22+seeds[i]*.15;
+    return {x:.5+r*Math.cos(angle),y:.5+r*Math.sin(angle)};
+  });
+  const iranEng={x:.15,y:.35};
+  const turkeyEng={x:.82,y:.25};
+
+  /* Arabic: all collapse to center-left */
+  const collapseCenter={x:.38,y:.5};
+  const iranAr={x:.15,y:.35};
+  const turkeyAr={x:.82,y:.25};
+
+  function lerp(a,b,t){return a+(b-a)*t}
+  function easeInOut(t){return t<.5?2*t*t:1-(-2*t+2)**2/2}
+
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    t+=.004;
+
+    /* Oscillate between English and Arabic layout */
+    const phase=(Math.sin(t)+1)/2;
+    const progress=easeInOut(phase);
+
+    /* Background labels */
+    ctx.font='11px monospace';ctx.fillStyle='rgba(136,153,184,.5)';
+    ctx.textAlign='left';
+    ctx.fillText('Prompting language: '+(progress<0.5?'English →':'← Arabic'),W*.05,H*.08);
+
+    const spread=1-progress*.9;
+
+    arabicCountries.forEach((name,i)=>{
+      const ex=engPositions[i].x,ey=engPositions[i].y;
+      const ax=collapseCenter.x+(seeds[i]-.5)*.06*spread;
+      const ay=collapseCenter.y+(seeds[(i+3)%14]-.5)*.06*spread;
+      const x=lerp(ex,ax,progress)*W;
+      const y=lerp(ey,ay,progress)*H;
+
+      const alpha=.7+.3*(1-progress);
+      ctx.beginPath();ctx.arc(x,y,5,0,6.28);
+      ctx.fillStyle=`rgba(220,50,50,${alpha})`;ctx.fill();
+
+      if(progress<0.4||i===0){
+        ctx.fillStyle=`rgba(220,100,100,${.6*(1-progress*.8)})`;
+        ctx.font='9px sans-serif';ctx.textAlign='center';
+        ctx.fillText(name,x,y-8);
+      }
+    });
+
+    /* Show collapse annotation */
+    if(progress>0.6){
+      const cx=collapseCenter.x*W,cy=collapseCenter.y*H;
+      const a=(progress-.6)/.4;
+      ctx.beginPath();ctx.arc(cx,cy,30*a+10,0,6.28);
+      ctx.strokeStyle=`rgba(220,50,50,${a*.5})`;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle=`rgba(220,50,50,${a})`;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      ctx.fillText('14 countries → 1 cluster',cx,cy+50*a);
+      ctx.fillText(`${(66.5*a).toFixed(0)}% identical responses`,cx,cy+64*a);
+    }
+
+    /* Iran — always separate */
+    function drawCountry(pos,name,color){
+      ctx.beginPath();ctx.arc(pos.x*W,pos.y*H,5,0,6.28);
+      ctx.fillStyle=color;ctx.fill();
+      ctx.fillStyle=color;ctx.font='9px sans-serif';ctx.textAlign='center';
+      ctx.fillText(name,pos.x*W,pos.y*H-10);
+    }
+    drawCountry(iranAr,'Iran (Persian)','rgba(41,128,185,.9)');
+    drawCountry(turkeyAr,'Turkey (Turkish)','rgba(39,174,96,.9)');
+
+    /* Legend */
+    ctx.font='9px sans-serif';ctx.fillStyle='rgba(136,153,184,.7)';ctx.textAlign='left';
+    ctx.fillText('● Arabic-speaking (collapse)',W*.05,H*.93);
+    ctx.fillStyle='rgba(41,128,185,.8)';ctx.fillText('● Persian (separate)',W*.05,H*.93+14);
+    ctx.fillStyle='rgba(39,174,96,.8)';ctx.fillText('● Turkish (separate)',W*.35,H*.93+14);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ── SAE percent counter ── */
+(function(){
+  const el=document.querySelector('[data-target-pct="28.6"]');
+  if(!el)return;
+  const obs=new IntersectionObserver(entries=>{
+    if(!entries[0].isIntersecting)return;
+    let start=null;
+    function step(ts){
+      if(!start)start=ts;
+      const p=Math.min((ts-start)/1500,1);
+      const ease=1-Math.pow(1-p,3);
+      el.textContent=(28.6*ease).toFixed(1)+'%';
+      if(p<1)requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    obs.disconnect();
+  },{threshold:.5});
+  obs.observe(el);
+})();
+
+/* ── Probe canvas ── */
+(function(){
+  const canvas=document.getElementById('probe-canvas');
+  const wrap=document.getElementById('probe-canvas-wrap');
+  const ctx=canvas.getContext('2d');
+  let W,H;
+  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
+  resize();window.addEventListener('resize',resize);
+
+  /* Approximate residualized R2 trajectory across 32 layers */
+  const layers=32;
+  /* Early: positive; middle: near 0; late: negative */
+  function r2(i){
+    if(i<4) return .06+.08*(i/4);
+    if(i<8) return .14-.14*((i-4)/4);
+    if(i<20) return -.02+.01*Math.sin(i*.4);
+    return -.04-.06*((i-20)/12);
+  }
+
+  let t=0;
+  function frame(){
+    ctx.clearRect(0,0,W,H);
+    t+=.01;
+
+    const padL=50,padR=20,padT=30,padB=40;
+    const plotW=W-padL-padR,plotH=H-padT-padB;
+    const midY=padT+plotH*.5;
+
+    /* Grid */
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    for(let i=0;i<=4;i++){
+      const y=padT+plotH*(i/4);
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();
+    }
+
+    /* Zero line */
+    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(padL,midY);ctx.lineTo(W-padR,midY);ctx.stroke();
+
+    /* Axes labels */
+    ctx.fillStyle='rgba(136,153,184,.6)';ctx.font='10px sans-serif';
+    ctx.textAlign='center';ctx.fillText('Layer',W/2,H-4);
+    ctx.textAlign='right';ctx.fillText('+0.14',padL-4,padT+8);
+    ctx.fillText('0',padL-4,midY+4);
+    ctx.fillText('−0.10',padL-4,H-padB-4);
+    ctx.textAlign='left';ctx.fillText('Residualised R²',padL+4,padT+14);
+
+    /* Phase annotations */
+    const earlyAlpha=.6+.2*Math.sin(t);
+    ctx.fillStyle=`rgba(26,138,108,${earlyAlpha})`;ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Cultural info enters',padL+plotW*.12,padT+10);
+    const lateAlpha=.6+.2*Math.sin(t+1);
+    ctx.fillStyle=`rgba(192,57,43,${lateAlpha})`;
+    ctx.fillText('Alignment counteracts',padL+plotW*.82,H-padB-24);
+
+    /* Curve */
+    ctx.beginPath();
+    for(let i=0;i<layers;i++){
+      const x=padL+plotW*(i/(layers-1));
+      const v=r2(i);
+      const y=midY-v*plotH*3;
+      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+    }
+    const grad=ctx.createLinearGradient(padL,0,W-padR,0);
+    grad.addColorStop(0,'rgba(26,138,108,.8)');
+    grad.addColorStop(.35,'rgba(200,150,12,.6)');
+    grad.addColorStop(1,'rgba(192,57,43,.8)');
+    ctx.strokeStyle=grad;ctx.lineWidth=2.5;ctx.stroke();
+
+    /* Dots at notable layers */
+    [[2,r2(2),'rgba(26,138,108,1)','L2'],[30,r2(30),'rgba(192,57,43,1)','L30']].forEach(([i,v,col,lbl])=>{
+      const x=padL+plotW*(i/(layers-1));
+      const y=midY-v*plotH*3;
+      ctx.beginPath();ctx.arc(x,y,5,0,6.28);ctx.fillStyle=col;ctx.fill();
+      ctx.fillStyle=col;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      ctx.fillText(lbl,x,y+(v>0?-10:14));
+    });
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+</script>
+</body>
+</html>

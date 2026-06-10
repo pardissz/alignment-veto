@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pkl
+*.pt
+*.bin
+*.safetensors
+.env
+*.log
+results/
+*.xlsx
+*.csv

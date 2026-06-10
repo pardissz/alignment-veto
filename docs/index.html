@@ -3,987 +3,1773 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>The Alignment Veto — How Safety Training Suppresses Cultural Knowledge in LLMs</title>
+<title>The Alignment Veto</title>
 <style>
-  :root {
-    --bg: #080c1e;
-    --bg2: #0d1230;
-    --bg3: #111840;
-    --gold: #C8960C;
-    --gold-light: #F0B730;
-    --red: #c0392b;
-    --red-light: #e74c3c;
-    --teal: #1A8A6C;
-    --teal-light: #27AE60;
-    --blue: #2980b9;
-    --blue-light: #5B9BD5;
-    --purple: #8e44ad;
-    --text: #e8ecf4;
-    --text-muted: #8899b8;
-    --border: rgba(200,150,12,0.2);
-  }
-  *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;line-height:1.7;overflow-x:hidden}
+:root{
+  --bg:#07091a;--bg2:#0c1028;--bg3:#111840;
+  --gold:#C8960C;--gold2:#F0B730;--gold3:#fff3cc;
+  --red:#b22222;--red2:#e74c3c;--red3:#ff9999;
+  --teal:#1A8A6C;--teal2:#27AE60;--teal3:#a8e6cf;
+  --blue:#1a5a9a;--blue2:#5B9BD5;--blue3:#b8d9f5;
+  --purple:#6c3483;--purple2:#9b59b6;
+  --text:#e8ecf4;--muted:#7a8aaa;--border:rgba(200,150,12,.18);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;line-height:1.7;overflow-x:hidden}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+.z1{position:relative;z-index:1}
 
-  /* ── Canvas ── */
-  #starfield{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;opacity:.5}
+/* NAV */
+nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(7,9,26,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;gap:1.8rem;align-items:center;flex-wrap:wrap}
+.nav-logo{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;margin-right:.5rem}
+nav a{color:var(--muted);text-decoration:none;font-size:.75rem;letter-spacing:.06em;transition:color .2s;font-family:sans-serif}
+nav a:hover{color:var(--gold2)}
 
-  /* ── Nav ── */
-  nav{position:fixed;top:0;width:100%;z-index:100;background:rgba(8,12,30,0.9);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 2rem;display:flex;gap:2rem;align-items:center}
-  nav .logo{font-size:.85rem;font-weight:700;color:var(--gold);letter-spacing:.15em;text-transform:uppercase;font-family:monospace}
-  nav a{color:var(--text-muted);text-decoration:none;font-size:.8rem;letter-spacing:.05em;transition:color .2s;font-family:sans-serif}
-  nav a:hover{color:var(--gold-light)}
+/* LAYOUT */
+section{position:relative;z-index:1;padding:5.5rem 2rem}
+.container{max-width:940px;margin:0 auto}
+.wide{max-width:1180px;margin:0 auto}
+.alt{background:rgba(12,16,40,.7)}
 
-  /* ── Sections ── */
-  section{position:relative;z-index:1;padding:6rem 2rem}
-  .container{max-width:920px;margin:0 auto}
-  .wide{max-width:1200px;margin:0 auto}
+/* HEADINGS */
+h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.13;font-weight:700;margin-bottom:1.2rem}
+h2{font-size:clamp(1.5rem,3vw,2.3rem);line-height:1.2;margin-bottom:.6rem}
+h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
+.accent{color:var(--gold)}
+.red-txt{color:var(--red2)}
+.teal-txt{color:var(--teal2)}
+.muted{color:var(--muted)}
+.divider{width:52px;height:3px;background:var(--gold);border-radius:2px;margin-bottom:1.4rem}
+.lead{font-size:1.02rem;color:var(--muted);margin-bottom:2rem;max-width:680px}
+.section-label{font-family:monospace;font-size:.68rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:.7rem}
 
-  /* ── Hero ── */
-  #hero{min-height:100vh;display:flex;align-items:center;padding-top:80px}
-  .hero-label{font-family:monospace;font-size:.75rem;letter-spacing:.2em;color:var(--gold);text-transform:uppercase;margin-bottom:1rem}
-  h1{font-size:clamp(2rem,5vw,3.5rem);line-height:1.15;font-weight:700;margin-bottom:1.5rem}
-  h1 .veto{color:var(--red-light);font-style:italic}
-  .hero-sub{font-size:1.1rem;color:var(--text-muted);max-width:680px;margin-bottom:2.5rem}
-  .authors{font-size:.9rem;color:var(--text-muted);margin-bottom:2.5rem}
-  .btn-row{display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:3rem}
-  .btn{padding:.6rem 1.5rem;border-radius:4px;text-decoration:none;font-size:.85rem;font-family:sans-serif;letter-spacing:.05em;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem}
-  .btn-primary{background:var(--gold);color:#0a0e1a;font-weight:700}
-  .btn-primary:hover{background:var(--gold-light)}
-  .btn-outline{border:1px solid var(--gold);color:var(--gold)}
-  .btn-outline:hover{background:rgba(200,150,12,.1)}
-  .btn-hf{border:1px solid var(--blue-light);color:var(--blue-light)}
-  .btn-hf:hover{background:rgba(91,155,213,.1)}
+/* BUTTONS */
+.btns{display:flex;gap:.8rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.btn{padding:.55rem 1.4rem;border-radius:4px;text-decoration:none;font-size:.8rem;font-family:sans-serif;letter-spacing:.05em;transition:all .2s;display:inline-flex;align-items:center;gap:.4rem;cursor:pointer}
+.btn-primary{background:var(--gold);color:#0a0e1a;font-weight:700}.btn-primary:hover{background:var(--gold2)}
+.btn-outline{border:1px solid var(--gold);color:var(--gold)}.btn-outline:hover{background:rgba(200,150,12,.1)}
+.btn-hf{border:1px solid var(--blue2);color:var(--blue2)}.btn-hf:hover{background:rgba(91,155,213,.1)}
 
-  /* ── Stat cards ── */
-  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:2rem}
-  .stat-card{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:1.25rem 1rem;text-align:center}
-  .stat-num{font-size:2rem;font-weight:700;color:var(--gold-light);display:block;font-family:sans-serif}
-  .stat-label{font-size:.75rem;color:var(--text-muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem}
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-top:2rem}
+.stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:1.1rem .8rem;text-align:center;transition:border-color .3s}
+.stat:hover{border-color:var(--gold)}
+.stat-n{font-size:1.9rem;font-weight:700;color:var(--gold2);display:block;font-family:sans-serif;line-height:1.1}
+.stat-l{font-size:.68rem;color:var(--muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.09em;margin-top:.2rem}
 
-  /* ── Section headers ── */
-  h2{font-size:clamp(1.5rem,3vw,2.2rem);margin-bottom:.75rem;line-height:1.2}
-  h2 .accent{color:var(--gold)}
-  h2 .red{color:var(--red-light)}
-  .section-lead{font-size:1.05rem;color:var(--text-muted);margin-bottom:2.5rem;max-width:700px}
-  h3{font-size:1.1rem;font-weight:700;margin-bottom:.75rem;color:var(--gold-light)}
+/* CANVAS WRAPPERS */
+.cvs-box{border-radius:10px;overflow:hidden;background:var(--bg);position:relative}
+.cvs-box canvas{display:block;width:100%;height:100%}
 
-  /* ── Divider ── */
-  .divider{width:60px;height:3px;background:var(--gold);margin-bottom:1.5rem;border-radius:2px}
+/* CARDS */
+.card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:1.4rem}
+.card.red-bd{border-color:rgba(178,34,34,.45)}
+.card.teal-bd{border-color:rgba(26,138,108,.45)}
+.card.gold-bd{border-color:rgba(200,150,12,.45)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2rem}
+@media(max-width:640px){.two-col,.three-col{grid-template-columns:1fr}}
+.tag{display:inline-block;padding:.12rem .45rem;border-radius:3px;font-size:.68rem;font-weight:700;font-family:monospace}
+.tag-r{background:rgba(178,34,34,.2);color:var(--red3);border:1px solid rgba(178,34,34,.3)}
+.tag-t{background:rgba(26,138,108,.2);color:var(--teal3);border:1px solid rgba(26,138,108,.3)}
+.tag-g{background:rgba(200,150,12,.15);color:var(--gold2);border:1px solid rgba(200,150,12,.25)}
 
-  /* ── Veto Animation ── */
-  #veto-demo{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-bottom:3rem}
-  #veto-canvas-wrap{position:relative;height:340px;overflow:hidden;border-radius:8px;background:var(--bg)}
-  #veto-canvas{width:100%;height:100%}
-  .veto-legend{display:flex;gap:2rem;justify-content:center;margin-top:1rem;font-size:.8rem;font-family:sans-serif;flex-wrap:wrap}
-  .veto-legend span{display:flex;align-items:center;gap:.4rem;color:var(--text-muted)}
-  .dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+/* TABLES */
+table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:.85rem;margin:1.2rem 0}
+th{color:var(--gold);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border);font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+td{padding:.5rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr.hl td{color:var(--text);font-weight:600}
 
-  /* ── Two-column ── */
-  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-top:2rem}
-  @media(max-width:640px){.two-col{grid-template-columns:1fr}}
-  .card{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:10px;padding:1.5rem}
-  .card.red-border{border-color:rgba(192,57,43,.5)}
-  .card.teal-border{border-color:rgba(26,138,108,.5)}
-  .card-tag{font-size:.7rem;font-family:monospace;letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem}
-  .red-tag{color:var(--red-light)}
-  .teal-tag{color:var(--teal-light)}
-  ul{padding-left:1.2rem;color:var(--text-muted);font-family:sans-serif;font-size:.9rem}
-  ul li{margin-bottom:.4rem}
+/* BARS */
+.bar-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem}
+.bar-lbl{width:190px;font-size:.75rem;font-family:monospace;color:var(--muted);text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:20px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+.bar-val{width:52px;font-size:.72rem;font-family:monospace;flex-shrink:0}
 
-  /* ── Safety Tax bars ── */
-  .bar-chart{margin:2rem 0}
-  .bar-row{display:flex;align-items:center;margin-bottom:.6rem;gap:.75rem}
-  .bar-label{width:180px;font-size:.8rem;font-family:monospace;color:var(--text-muted);text-align:right;flex-shrink:0}
-  .bar-track{flex:1;height:22px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden;position:relative}
-  .bar-fill{height:100%;border-radius:3px;transition:width 1.2s cubic-bezier(.4,0,.2,1);width:0}
-  .bar-val{font-size:.75rem;font-family:monospace;color:var(--text-muted);width:50px;flex-shrink:0}
+/* PIPELINE */
+.pipe-stages{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin:1.5rem 0}
+@media(max-width:600px){.pipe-stages{grid-template-columns:1fr 1fr}}
+.pipe-stage{border-radius:8px;padding:1rem;text-align:center;border:1px solid var(--border);position:relative;transition:border-color .4s}
+.pipe-stage.active{border-color:var(--gold)}
+.stage-name{font-size:.75rem;font-family:monospace;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:.5rem}
+.stage-val{font-size:1.6rem;font-weight:700;display:block;font-family:sans-serif;line-height:1.1}
+.stage-sub{font-size:.7rem;color:var(--muted);font-family:sans-serif;margin-top:.25rem}
 
-  /* ── Country grid ── */
-  .country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:.75rem;margin:2rem 0}
-  .country-card{border-radius:8px;padding:.75rem;font-family:sans-serif;font-size:.78rem;position:relative;overflow:hidden;cursor:default;transition:transform .2s}
-  .country-card:hover{transform:translateY(-2px)}
-  .country-name{font-weight:600;margin-bottom:.25rem}
-  .country-score{font-size:1.1rem;font-weight:700}
-  .country-bar{height:4px;border-radius:2px;margin-top:.5rem}
+/* SCATTER */
+.scatter-wrap{position:relative;height:380px;margin:1.5rem 0}
+.scatter-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
 
-  /* ── Language section ── */
-  .lang-demo{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2rem;margin-top:2rem}
-  #lang-canvas-wrap{height:280px;position:relative;border-radius:8px;background:var(--bg);overflow:hidden}
-  #lang-canvas{width:100%;height:100%}
+/* METERS (SAE) */
+.meter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:1.5rem 0}
+.meter{background:rgba(255,255,255,.03);border-radius:10px;padding:1.4rem;text-align:center;border:1px solid var(--border);overflow:hidden;position:relative}
+.meter-fill{position:absolute;bottom:0;left:0;right:0;transition:height 1.4s cubic-bezier(.4,0,.2,1);height:0}
+.meter-content{position:relative;z-index:1}
+.meter-pct{font-size:2.4rem;font-weight:700;font-family:sans-serif;display:block;line-height:1.1}
+.meter-label{font-size:.75rem;font-family:monospace;text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.meter-desc{font-size:.75rem;color:var(--muted);font-family:sans-serif;margin-top:.35rem}
 
-  /* ── SAE section ── */
-  .sae-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin:2rem 0}
-  @media(max-width:600px){.sae-grid{grid-template-columns:1fr}}
-  .sae-card{background:rgba(255,255,255,0.03);border-radius:10px;padding:1.5rem;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
-  .sae-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px}
-  .sae-t1::after{background:var(--teal)}
-  .sae-t2::after{background:var(--blue)}
-  .sae-t3::after{background:var(--red)}
-  .sae-pct{font-size:2.5rem;font-weight:700;display:block;margin:.5rem 0;font-family:sans-serif}
-  .sae-desc{font-size:.8rem;color:var(--text-muted);font-family:sans-serif}
+/* HEATMAP */
+.hm-grid{display:grid;grid-template-columns:auto repeat(3,1fr);gap:3px;margin:1.5rem 0}
+.hm-cell{border-radius:4px;padding:.6rem .4rem;text-align:center;font-size:.78rem;font-family:sans-serif;transition:opacity .4s;position:relative}
+.hm-hdr{color:var(--muted);font-size:.72rem;font-family:monospace;text-transform:uppercase;letter-spacing:.08em;display:flex;align-items:center;justify-content:center;padding:.4rem}
+.hm-row-lbl{color:var(--muted);font-family:monospace;font-size:.75rem;display:flex;align-items:center;justify-content:flex-end;padding-right:.6rem}
 
-  /* ── Framing table ── */
-  table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:.88rem;margin:1.5rem 0}
-  th{text-align:left;color:var(--gold);font-weight:600;padding:.6rem .8rem;border-bottom:1px solid var(--border);font-size:.8rem;text-transform:uppercase;letter-spacing:.07em}
-  td{padding:.6rem .8rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--text-muted);vertical-align:middle}
-  tr:hover td{background:rgba(255,255,255,.02)}
-  .highlight-row td{color:var(--text);font-weight:600}
-  .tag{display:inline-block;padding:.15rem .5rem;border-radius:3px;font-size:.7rem;font-weight:600;font-family:monospace}
-  .tag-best{background:rgba(26,138,108,.2);color:var(--teal-light);border:1px solid rgba(26,138,108,.3)}
-  .tag-worst{background:rgba(192,57,43,.2);color:var(--red-light);border:1px solid rgba(192,57,43,.3)}
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1.5rem 0}
+.step{background:rgba(255,255,255,.03);border-radius:8px;padding:1.2rem;border:1px solid var(--border)}
+.step-n{font-size:1.8rem;font-weight:700;color:var(--gold);opacity:.35;line-height:1;display:block;font-family:sans-serif}
+.step-t{font-size:.88rem;font-weight:700;margin:.2rem 0}
+.step-b{font-size:.78rem;color:var(--muted);font-family:sans-serif}
 
-  /* ── Mechanism section ── */
-  .mechanism-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin:2rem 0}
-  .step{background:rgba(255,255,255,.03);border-radius:10px;padding:1.25rem;border:1px solid var(--border)}
-  .step-num{font-size:2rem;font-weight:700;color:var(--gold);opacity:.4;display:block;font-family:sans-serif;line-height:1}
-  .step-title{font-size:.9rem;font-weight:700;margin:.25rem 0}
-  .step-body{font-size:.82rem;color:var(--text-muted);font-family:sans-serif}
+/* COUNTRY */
+.country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:.7rem;margin:1.5rem 0}
+.cc{border-radius:8px;padding:.8rem .7rem;cursor:default;transition:transform .18s;border:1px solid transparent}
+.cc:hover{transform:translateY(-3px)}
+.cc-name{font-size:.78rem;font-weight:600;margin-bottom:.2rem}
+.cc-score{font-size:1.15rem;font-weight:700;font-family:sans-serif}
+.cc-bar{height:3px;border-radius:2px;margin-top:.4rem}
+.cc-refusal{font-size:.65rem;color:var(--muted);font-family:sans-serif;margin-top:.25rem}
 
-  /* ── Interactive probe vis ── */
-  #probe-canvas-wrap{height:300px;background:var(--bg);border-radius:8px;position:relative;overflow:hidden;margin-top:1.5rem}
-  #probe-canvas{width:100%;height:100%}
+/* FADE IN */
+.fi{opacity:0;transform:translateY(20px);transition:opacity .65s,transform .65s}
+.fi.vis{opacity:1;transform:translateY(0)}
 
-  /* ── Quote ── */
-  blockquote{border-left:3px solid var(--gold);padding:1rem 1.5rem;margin:2rem 0;color:var(--text-muted);font-style:italic;font-size:1.05rem;background:rgba(200,150,12,.05);border-radius:0 8px 8px 0}
+/* BLOCKQUOTE */
+blockquote{border-left:3px solid var(--gold);padding:.9rem 1.4rem;margin:1.8rem 0;font-style:italic;font-size:1rem;color:var(--muted);background:rgba(200,150,12,.04);border-radius:0 8px 8px 0}
+blockquote strong{color:var(--text)}
 
-  /* ── BibTeX ── */
-  pre{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;padding:1.5rem;font-size:.82rem;color:var(--text-muted);overflow-x:auto;font-family:monospace;line-height:1.6}
+/* CODE/PRE */
+pre{background:rgba(0,0,0,.45);border:1px solid var(--border);border-radius:8px;padding:1.4rem;font-size:.8rem;color:var(--muted);overflow-x:auto;font-family:monospace;line-height:1.6}
+code{font-family:monospace;font-size:.85em;color:var(--gold2);background:rgba(200,150,12,.08);padding:.1rem .3rem;border-radius:3px}
 
-  /* ── Footer ── */
-  footer{background:var(--bg2);border-top:1px solid var(--border);padding:2.5rem;text-align:center;font-family:sans-serif;font-size:.8rem;color:var(--text-muted);position:relative;z-index:1}
-  footer a{color:var(--gold);text-decoration:none}
+/* TOOLTIP */
+[data-tip]{cursor:help;position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.92);color:var(--text);font-size:.72rem;white-space:nowrap;padding:.35rem .7rem;border-radius:4px;z-index:300;pointer-events:none;font-family:sans-serif;border:1px solid var(--border);font-style:normal}
 
-  /* ── Scroll animations ── */
-  .fade-in{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
-  .fade-in.visible{opacity:1;transform:translateY(0)}
+/* LEGEND DOT */
+.ldot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
+.legend{display:flex;gap:1.4rem;flex-wrap:wrap;font-size:.75rem;font-family:sans-serif;color:var(--muted);justify-content:center;margin-top:.9rem}
+.legend span{display:flex;align-items:center;gap:.35rem}
 
-  /* ── Tooltip ── */
-  [data-tip]{position:relative;cursor:help}
-  [data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.9);color:var(--text);font-size:.75rem;white-space:nowrap;padding:.4rem .75rem;border-radius:4px;z-index:200;pointer-events:none;font-family:sans-serif;border:1px solid var(--border)}
-
-  .alt-bg{background:rgba(13,18,48,.6)}
+/* FOOTER */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:sans-serif;font-size:.78rem;color:var(--muted);position:relative;z-index:1}
+footer a{color:var(--gold);text-decoration:none}
 </style>
 </head>
 <body>
 
-<canvas id="starfield"></canvas>
+<canvas id="bg-canvas"></canvas>
 
+<!-- NAV -->
 <nav>
-  <span class="logo">Alignment Veto</span>
+  <span class="nav-logo">Alignment Veto</span>
   <a href="#concept">Concept</a>
-  <a href="#findings">Findings</a>
+  <a href="#pipeline">Pipeline</a>
+  <a href="#taxonomy">Taxonomy</a>
+  <a href="#tax">Safety Tax</a>
   <a href="#countries">Equity</a>
+  <a href="#framing">Framing</a>
   <a href="#language">Language</a>
   <a href="#mechanism">Mechanism</a>
-  <a href="#data">Data</a>
+  <a href="#frontier">Frontier</a>
   <a href="#cite">Cite</a>
 </nav>
 
-<!-- ══════════════════════════════ HERO ══════════════════════════════ -->
-<section id="hero">
-  <div class="container">
-    <div class="hero-label">ACL 2026</div>
-    <h1>
-      The <span class="veto">Alignment Veto:</span><br/>
-      How Safety Training Suppresses<br/>Cultural Knowledge in LLMs
-    </h1>
-    <p class="authors">Pardis Sadat Zahraei &nbsp;·&nbsp; Nizi Nazar &nbsp;·&nbsp; Ehsaneddin Asgari</p>
-    <p class="hero-sub">
-      Across 16 MENA countries, 26 models, and 1.53M human survey responses, we show
-      that when a model refuses a culturally sensitive question, the knowledge is
-      <strong>suppressed — not erased.</strong> The model's internal logits at refusal
-      correlate with human data more than its freely generated answers.
-    </p>
-    <div class="btn-row">
-      <a href="#" class="btn btn-primary">📄 Paper (arXiv)</a>
-      <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" class="btn btn-hf">🤗 Dataset</a>
-      <a href="https://github.com/pardissz/alignment-veto" class="btn btn-outline">💻 GitHub</a>
-    </div>
-    <div class="stats-grid fade-in">
-      <div class="stat-card">
-        <span class="stat-num" data-target="26">0</span>
-        <div class="stat-label">Models Evaluated</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" data-target="16">0</span>
-        <div class="stat-label">MENA Countries</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" data-target="864">0</span>
-        <div class="stat-label">Survey Questions</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" data-target="1530000" data-suffix="M">0</span>
-        <div class="stat-label">Human Survey Responses</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" data-target="376" data-pct="1">0</span>
-        <div class="stat-label">Max Safety Tax</div>
-      </div>
-      <div class="stat-card">
-        <span class="stat-num" data-target="198" data-pct="1">0</span>
-        <div class="stat-label">Country Equity Gap</div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ CONCEPT ══════════════════════════════ -->
-<section id="concept" class="alt-bg">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>The <span class="red">Alignment Veto</span></h2>
-    <p class="section-lead">
-      Standard assumption: a refused question means missing knowledge.<br/>
-      Our finding: the knowledge is <em>present</em> — but blocked.
-    </p>
-
-    <div id="veto-demo" class="fade-in">
-      <p style="font-size:.85rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem;text-align:center">
-        Live animation — watch what happens inside the model vs. what comes out
-      </p>
-      <div id="veto-canvas-wrap">
-        <canvas id="veto-canvas"></canvas>
-      </div>
-      <div class="veto-legend">
-        <span><span class="dot" style="background:var(--teal)"></span>Internal logits at refusal</span>
-        <span><span class="dot" style="background:var(--red)"></span>Expressed answer</span>
-        <span><span class="dot" style="background:var(--gold)"></span>Human survey ground truth</span>
-        <span><span class="dot" style="background:var(--blue)"></span>Alignment gate</span>
-      </div>
-    </div>
-
-    <div class="two-col fade-in">
-      <div class="card red-border">
-        <div class="card-tag red-tag">⛔ Suppression Failure</div>
-        <h3>Knowledge is present, blocked at output</h3>
-        <ul>
-          <li>Model refuses the question</li>
-          <li>Internal logit distribution aligns with human data</li>
-          <li>Safety gate intercepts at generation time</li>
-          <li>Addressable with third-person framing or DPO curation</li>
-          <li>Dominant in T3 LGBTQ+ questions</li>
-        </ul>
-      </div>
-      <div class="card teal-border">
-        <div class="card-tag teal-tag">📉 Representational Bias</div>
-        <h3>Knowledge encoding itself is off</h3>
-        <ul>
-          <li>Model answers freely</li>
-          <li>Output diverges from human survey data</li>
-          <li>No generation-time gate to bypass</li>
-          <li>Requires MENA-specific training data</li>
-          <li>Dominant in gender equality questions</li>
-        </ul>
-      </div>
-    </div>
-
-    <blockquote>
-      The model's internal logit distributions at the moment of refusal correlate
-      with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers on
-      non-refused items — refused T3 EV-NVAS 0.718 vs. accepted T3 NVAS 0.690 (Δ=+0.029, p&lt;10⁻¹³).
-    </blockquote>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ FINDINGS ══════════════════════════════ -->
-<section id="findings">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>The Safety <span class="accent">Tax</span></h2>
-    <p class="section-lead">
-      Instruction-tuned models refuse T3 sensitive questions at 23.9% vs. 12.4% for benign T1 questions —
-      a +11.5% safety tax (Cohen's d=0.303, p&lt;10⁻¹¹⁵). The distribution is highly unequal.
-    </p>
-
-    <div class="bar-chart fade-in" id="tax-chart">
-      <h3 style="margin-bottom:1.5rem">Safety Tax by Model (T3 − T1 refusal rate)</h3>
-    </div>
-
-    <div class="two-col fade-in" style="margin-top:2rem">
-      <div class="card">
-        <h3>Scale does not predict the tax</h3>
-        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
-          Spearman ρ=0.147 (p=0.464) between parameter count and safety tax.
-          OLMo-32B-IT: 25.3% tax. GPT-5: −2.9% tax.
-          Size is irrelevant; alignment pipeline is what matters.
-        </p>
-      </div>
-      <div class="card">
-        <h3>DPO stage installs the tax</h3>
-        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
-          Within OLMo-3 and Tulu-3 families, safety tax increases monotonically:
-          Base → SFT → DPO → IT (p&lt;0.05 within-family, paired).
-          DPO adds suppression; IT adds more.
-        </p>
-      </div>
-    </div>
-
-    <div class="fade-in" style="margin-top:2.5rem">
-      <h3>Framing Comparison (19 instruct models, T3 questions)</h3>
-      <table>
-        <thead>
-          <tr><th>Framing</th><th>T3 Refusal Rate</th><th>Mean NVAS</th><th></th></tr>
-        </thead>
-        <tbody>
-          <tr><td>No-Mention-EN</td><td>22.3%</td><td>—</td><td></td></tr>
-          <tr><td>Persona-EN</td><td>24.3%</td><td>0.684</td><td></td></tr>
-          <tr><td>Persona-Native</td><td>16.2%</td><td>0.665</td><td></td></tr>
-          <tr class="highlight-row"><td><strong>Third-EN ✦</strong></td><td><strong>17.6%</strong></td><td><strong>0.694</strong></td><td><span class="tag tag-best">Best</span></td></tr>
-          <tr><td>Third-Native</td><td>16.4%</td><td>0.661</td><td></td></tr>
-        </tbody>
-      </table>
-      <p style="font-size:.82rem;color:var(--text-muted);font-family:sans-serif">
-        Third/Observer framing provides <strong style="color:var(--text)">2.6× the NVAS benefit</strong> of Persona on T3 (+0.081 vs +0.031 relative to No-Mention).
-        Note: Third-EN also increases JSD (distributional spread) from 0.435 → 0.451 — a NVAS/JSD trade-off.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ COUNTRIES ══════════════════════════════ -->
-<section id="countries" class="alt-bg">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>The Gate Is <span class="red">Inequitable</span></h2>
-    <p class="section-lead">
-      A 19.8% alignment-quality gap separates best- and worst-served nations.
-      Hover cards for details.
-    </p>
-
-    <div class="country-grid fade-in" id="country-grid"></div>
-
-    <p style="font-size:.85rem;color:var(--text-muted);font-family:sans-serif;margin-top:1rem">
-      Color scale: <span style="color:var(--red-light)">red</span> = low T3 NVAS (worst-served) →
-      <span style="color:var(--teal-light)">teal</span> = high T3 NVAS (best-served).
-      Palestine has highest T3 NVAS (0.731) <em>and</em> highest T3 refusal (0.352) —
-      consistent with the alignment veto: accurate internal representation, high suppression.
-    </p>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ LANGUAGE ══════════════════════════════ -->
-<section id="language">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>Native Language <span class="red">Hurts</span></h2>
-    <p class="section-lead">
-      Switching from English to Arabic/Persian/Turkish drops mean NVAS by −0.050 points
-      consistently across all 26 models — including Arabic-specialized models.
-    </p>
-
-    <div class="lang-demo fade-in">
-      <p style="font-size:.8rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem;text-align:center">
-        PCA visualization: Arabic prompting collapses 14 distinct country identities into one cluster
-      </p>
-      <div id="lang-canvas-wrap">
-        <canvas id="lang-canvas"></canvas>
-      </div>
-    </div>
-
-    <div class="two-col fade-in" style="margin-top:2rem">
-      <div class="card">
-        <h3>Language penalty breakdown</h3>
-        <table>
-          <thead><tr><th>Language</th><th>NVAS loss</th></tr></thead>
-          <tbody>
-            <tr><td>Arabic</td><td style="color:var(--gold)">−0.024</td></tr>
-            <tr><td>Persian</td><td style="color:var(--red-light)">−0.064</td></tr>
-            <tr><td>Turkish</td><td style="color:var(--red-light)">−0.064</td></tr>
-            <tr><td><strong>Mean</strong></td><td style="color:var(--red-light)"><strong>−0.050</strong></td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="card">
-        <h3>Arabic country collapse</h3>
-        <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif">
-          Under Arabic prompting, 14 Arabic-speaking countries receive identical responses
-          for <strong style="color:var(--text)">66.5%</strong> of questions (vs 46.5% in English).
-          Within-group σ falls by <strong style="color:var(--text)">33.5%</strong> under Observer framing.
-          Language script, not country identity, drives the answer.
-        </p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ MECHANISM ══════════════════════════════ -->
-<section id="mechanism" class="alt-bg">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>Mechanistic <span class="accent">Evidence</span></h2>
-    <p class="section-lead">
-      SAE analysis in Tulu-3-8B identifies a candidate DPO-stage feature that selectively
-      gates T3 sensitive content with no collateral effect on benign content.
-    </p>
-
-    <div class="sae-grid fade-in">
-      <div class="sae-card sae-t1">
-        <div class="card-tag teal-tag">T1 — Benign</div>
-        <span class="sae-pct" style="color:var(--teal-light)" data-target-pct="0">0%</span>
-        <div class="sae-desc">Veto feature activation<br/>0 of 40 seeds fire on T1</div>
-      </div>
-      <div class="sae-card sae-t2">
-        <div class="card-tag" style="color:var(--blue-light)">T2 — Moderate</div>
-        <span class="sae-pct" style="color:var(--blue-light)" data-target-pct="0.4">&lt;0.4%</span>
-        <div class="sae-desc">Veto feature activation<br/>Very rare; near-zero</div>
-      </div>
-      <div class="sae-card sae-t3">
-        <div class="card-tag red-tag">T3 — Sensitive</div>
-        <span class="sae-pct" style="color:var(--red-light)" data-target-pct="28.6">0%</span>
-        <div class="sae-desc">Veto feature activation<br/><strong>70× ratio vs T2</strong></div>
-      </div>
-    </div>
-
-    <div class="mechanism-steps fade-in">
-      <div class="step">
-        <span class="step-num">01</span>
-        <div class="step-title">TopK SAE Training</div>
-        <div class="step-body">F=8192 features, K=32, trained on layer-17 residual-stream activations of Tulu-3-8B-IT</div>
-      </div>
-      <div class="step">
-        <span class="step-num">02</span>
-        <div class="step-title">T3-Selective Feature</div>
-        <div class="step-body">F1=0.39–0.46 selectivity; 28.6% T3 activation rate, &lt;0.4% T2, 0% T1 (70× ratio)</div>
-      </div>
-      <div class="step">
-        <span class="step-num">03</span>
-        <div class="step-title">Ablation Effect</div>
-        <div class="step-body">Zeroing the feature: ΔŷT3 = +0.250 (p=0.016) across 20 seeds. ΔŷT1 = 0.000 in all 40 seeds</div>
-      </div>
-      <div class="step">
-        <span class="step-num">04</span>
-        <div class="step-title">DPO Installs It</div>
-        <div class="step-body">DPO result stronger (p=0.003) than IT (p=0.016). Suppression circuit present before IT stage</div>
-      </div>
-      <div class="step">
-        <span class="step-num">05</span>
-        <div class="step-title">36.9σ Outlier</div>
-        <div class="step-body">Ablating 50 random features: mean Δ=0.000±0.001. The veto feature is a 36.9σ outlier (p&lt;10⁻⁴)</div>
-      </div>
-    </div>
-
-    <div class="fade-in" style="margin-top:2rem">
-      <h3>Residualized Probing: Late-Layer Inversion</h3>
-      <p style="font-size:.88rem;color:var(--text-muted);font-family:sans-serif;margin-bottom:1rem">
-        Probing for cross-country cultural variation after subtracting per-question means
-        reveals a two-phase trajectory in Tulu-3-8B, OLMo-7B, and LLaMA-8B:
-      </p>
-      <div id="probe-canvas-wrap">
-        <canvas id="probe-canvas"></canvas>
-      </div>
-      <div style="display:flex;gap:2rem;justify-content:center;margin-top:.75rem;font-size:.8rem;font-family:sans-serif;color:var(--text-muted);flex-wrap:wrap">
-        <span><span class="dot" style="background:var(--teal)"></span> Early layers (2–3): cultural info enters (R²=+0.06 to +0.14)</span>
-        <span><span class="dot" style="background:var(--red)"></span> Late layers (28–31): alignment counteracts it (R² turns negative)</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ DATA ══════════════════════════════ -->
-<section id="data">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>Data &amp; <span class="accent">Code</span></h2>
-    <p class="section-lead">All model responses, code, and analysis scripts will be publicly released.</p>
-
-    <div class="two-col fade-in">
-      <div class="card">
-        <div class="card-tag" style="color:var(--blue-light)">🤗 HuggingFace Dataset</div>
-        <h3><a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" style="color:var(--gold-light);text-decoration:none">alignment-veto-responses</a></h3>
-        <ul>
-          <li>~1.53M model responses</li>
-          <li>26 open models × 864 questions</li>
-          <li>16 countries × 6 framings</li>
-          <li>NVAS, EV-NVAS, refusal labels</li>
-          <li>English + Arabic/Persian/Turkish</li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="card-tag" style="color:var(--text-muted)">💻 GitHub Repository</div>
-        <h3><a href="https://github.com/pardissz/alignment-veto" style="color:var(--gold-light);text-decoration:none">pardissz/alignment-veto</a></h3>
-        <ul>
-          <li>Analysis scripts (run_*.py)</li>
-          <li>SAE implementation (TopK)</li>
-          <li>Probing pipeline</li>
-          <li>Figure generation</li>
-          <li>Framing condition templates</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="fade-in" style="margin-top:2rem">
-      <h3>Quick Start</h3>
-      <pre>from datasets import load_dataset
-
-ds = load_dataset("PardisSzah/alignment-veto-responses")
-# Columns: model, country, framing, language, tier, question,
-#          response, refused, nvas, ev_nvas, human_mean</pre>
-    </div>
-  </div>
-</section>
-
-<!-- ══════════════════════════════ CITE ══════════════════════════════ -->
-<section id="cite" class="alt-bg">
-  <div class="container">
-    <div class="divider"></div>
-    <h2>Citation</h2>
-    <pre>@article{zahraei2026alignmentveto,
-  title     = {The Alignment Veto: How Safety Training Suppresses Cultural Knowledge in LLMs},
-  author    = {Zahraei, Pardis Sadat and Nazar, Nizi and Asgari, Ehsaneddin},
-  journal   = {arXiv preprint},
-  year      = {2026}
-}</pre>
-  </div>
-</section>
-
-<footer>
-  <p>The Alignment Veto &nbsp;·&nbsp; 2026 &nbsp;·&nbsp;
-    <a href="https://github.com/pardissz/alignment-veto">GitHub</a> &nbsp;·&nbsp;
-    <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses">HuggingFace</a>
+<!-- ═══════════════════════ HERO ═══════════════════════ -->
+<section id="hero" style="min-height:100vh;display:flex;align-items:center;padding-top:80px">
+<div class="container">
+  <div class="section-label">ACL 2026 · MENA Cultural Alignment</div>
+  <h1>The <span class="red-txt" style="font-style:italic">Alignment Veto:</span><br/>
+  How Safety Training Suppresses<br/>Cultural Knowledge in LLMs</h1>
+  <p style="color:var(--muted);font-size:.92rem;margin-bottom:1.5rem">
+    Pardis Sadat Zahraei &nbsp;·&nbsp; Nizi Nazar &nbsp;·&nbsp; Ehsaneddin Asgari
   </p>
-</footer>
+  <p class="lead">When a model refuses a culturally sensitive question, the standard assumption is that it lacks the knowledge.
+  Across 16 MENA countries, 26 models, and 1.53M human survey responses, we show the assumption is often <strong>wrong.</strong>
+  The knowledge is present — but <strong style="color:var(--red2)">vetoed</strong> at output time.</p>
+  <div class="btns">
+    <a href="#" class="btn btn-primary">📄 arXiv Paper</a>
+    <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" class="btn btn-hf">🤗 Dataset</a>
+    <a href="https://github.com/pardissz/alignment-veto" class="btn btn-outline">💻 GitHub</a>
+  </div>
+  <div class="stats fi" id="hero-stats">
+    <div class="stat"><span class="stat-n" data-to="26">0</span><div class="stat-l">Models Evaluated</div></div>
+    <div class="stat"><span class="stat-n" data-to="16">0</span><div class="stat-l">MENA Countries</div></div>
+    <div class="stat"><span class="stat-n" data-to="864">0</span><div class="stat-l">Survey Questions</div></div>
+    <div class="stat"><span class="stat-n" data-to="153" data-sfx="0K+">0</span><div class="stat-l">Human Responses (×10K)</div></div>
+    <div class="stat"><span class="stat-n" data-to="376" data-pct="1">0</span><div class="stat-l">Max Safety Tax</div></div>
+    <div class="stat"><span class="stat-n" data-to="198" data-pct="1">0</span><div class="stat-l">Country Equity Gap</div></div>
+  </div>
+</div>
+</section>
 
-<!-- ══════════════════════════════ SCRIPTS ══════════════════════════════ -->
+<!-- ═══════════════════════ CONCEPT ═══════════════════════ -->
+<section id="concept" class="alt">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Core Finding</div>
+  <h2>The <span class="red-txt">Alignment Veto</span></h2>
+  <p class="lead">At the moment of refusal, a model's <em>internal</em> logit distribution correlates with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers. The knowledge is not erased — it is gated.</p>
+
+  <!-- Main concept animation -->
+  <div class="cvs-box fi" style="height:360px;margin-bottom:1.5rem" id="concept-box">
+    <canvas id="concept-canvas"></canvas>
+  </div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--gold)"></span>Human survey ground truth</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>Internal logits at moment of refusal (EV-NVAS 0.718)</span>
+    <span><span class="ldot" style="background:var(--red2)"></span>Expressed answer on accepted items (NVAS 0.690)</span>
+    <span><span class="ldot" style="background:var(--blue2)"></span>Alignment gate</span>
+  </div>
+
+  <blockquote style="margin-top:1.8rem">
+    Refused T3 <strong>EV-NVAS = 0.718</strong> vs accepted T3 <strong>NVAS = 0.690</strong>
+    (Δ=+0.029, p&lt;10⁻¹³). Accepted T3 responses skew toward liberal Western defaults:
+    61.5% are <em>above</em> the human survey mean (+0.104 overestimation, p&lt;10⁻²⁴⁸).
+  </blockquote>
+
+  <div class="two-col fi" style="margin-top:1.8rem">
+    <div class="card red-bd">
+      <div class="tag tag-r" style="margin-bottom:.5rem">⛔ Suppression Failure</div>
+      <h3>Gate blocks accurate knowledge</h3>
+      <p style="font-size:.85rem;color:var(--muted);font-family:sans-serif">Model refuses. But its internal logit distribution already matches the human survey. A safety-trained output gate intercepts before generation. <strong style="color:var(--text)">Addressable</strong> with third-person framing or DPO curation.</p>
+      <div style="font-size:.78rem;font-family:monospace;margin-top:.8rem;color:var(--red3)">Dominant in: LGBTQ+ acceptance questions<br/>Mean refusal: 41.9% · NVAS when answered: 0.580</div>
+    </div>
+    <div class="card teal-bd">
+      <div class="tag tag-t" style="margin-bottom:.5rem">📉 Representational Bias</div>
+      <h3>Encoding itself diverges</h3>
+      <p style="font-size:.85rem;color:var(--muted);font-family:sans-serif">Model answers freely, but the output diverges from human data. No gate to bypass — the problem is in the representation itself. <strong style="color:var(--text)">Requires</strong> MENA-specific training data.</p>
+      <div style="font-size:.78rem;font-family:monospace;margin-top:.8rem;color:var(--teal3)">Dominant in: Gender equality questions<br/>Mean refusal: 22.5% · NVAS when answered: 0.579</div>
+    </div>
+  </div>
+
+  <!-- Suppression cost scatter: 19/24 above diagonal -->
+  <div style="margin-top:2.5rem" class="fi">
+    <h3>19 of 24 models: refused rows carry MORE cultural accuracy than accepted answers</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif;margin-bottom:.5rem">Each dot is a model. Above the diagonal = refused T3 EV-NVAS &gt; accepted T3 NVAS (the veto is blocking something accurate).</p>
+    <div class="scatter-wrap" style="height:340px">
+      <canvas id="suppression-scatter"></canvas>
+    </div>
+    <div class="legend">
+      <span><span class="ldot" style="background:var(--teal2)"></span>Above diagonal (knowledge suppressed)</span>
+      <span><span class="ldot" style="background:var(--red2)"></span>Below diagonal (genuine bias)</span>
+      <span><span class="ldot" style="background:rgba(255,255,255,.3)"></span>Diagonal: EV-NVAS = NVAS</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ PIPELINE ═══════════════════════ -->
+<section id="pipeline">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Gating, Not Erasing</div>
+  <h2>DPO Installs the Gate — <span class="accent">Without Erasing Knowledge</span></h2>
+  <p class="lead">The training pipeline tells us <em>when</em> suppression is installed. SFT improves cultural accuracy. DPO then adds refusals — but doesn't degrade the accuracy of answers that do get through. The gate is added; the representation survives.</p>
+
+  <!-- Animated dual-axis pipeline -->
+  <div class="cvs-box fi" style="height:320px" id="pipeline-box">
+    <canvas id="pipeline-canvas"></canvas>
+  </div>
+  <div class="legend" style="margin-top:.7rem">
+    <span><span class="ldot" style="background:var(--red2)"></span>T3 Refusal rate (DPO adds suppression)</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>NVAS on accepted T3 answers (stays up → not erased)</span>
+  </div>
+
+  <div class="fi" style="margin-top:1.8rem">
+    <table>
+      <thead><tr><th>Stage</th><th>T3 Refusal</th><th>NVAS (accepted T3)</th><th>Interpretation</th></tr></thead>
+      <tbody>
+        <tr><td>OLMo-32B Base</td><td>20.5%</td><td>0.477</td><td style="color:var(--muted);font-size:.8rem">No gate yet — poor cultural accuracy</td></tr>
+        <tr><td>OLMo-32B SFT</td><td>9.3%</td><td style="color:var(--teal2)">0.599 (+0.122)</td><td style="color:var(--muted);font-size:.8rem">SFT: cultural knowledge installed</td></tr>
+        <tr><td>OLMo-32B DPO</td><td style="color:var(--red2)">18.6% ↑</td><td style="color:var(--teal2)">0.670 (+0.193)</td><td style="color:var(--gold);font-size:.8rem;font-weight:600">← DPO adds gate, NVAS still rises</td></tr>
+        <tr class="hl"><td>OLMo-32B IT</td><td style="color:var(--red2)">35.7% ↑↑</td><td style="color:var(--teal2)">0.667 (+0.190)</td><td style="color:var(--muted);font-size:.8rem">Gate widens; knowledge preserved</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:.8rem;color:var(--muted);font-family:sans-serif">
+      <strong style="color:var(--gold2)">Key insight:</strong> If alignment were erasing cultural representations, NVAS would drop as refusal rises. It doesn't. The gate and the representation are separate. SFT installs knowledge; DPO installs the filter.
+    </p>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ TAXONOMY ═══════════════════════ -->
+<section id="taxonomy" class="alt">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Two Failure Modes</div>
+  <h2>The T3 Question <span class="accent">Taxonomy</span></h2>
+  <p class="lead">Plotting refusal rate vs NVAS-when-answered for all 29 T3 questions reveals two empirically distinct clusters — each requiring a different fix.</p>
+
+  <div class="cvs-box fi" style="height:420px" id="taxonomy-box">
+    <canvas id="taxonomy-canvas"></canvas>
+  </div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--red2)"></span>LGBTQ+ acceptance (suppression cluster)</span>
+    <span><span class="ldot" style="background:var(--blue2)"></span>Gender equality (representational bias cluster)</span>
+    <span><span class="ldot" style="background:var(--gold)"></span>Other T3 topics</span>
+  </div>
+  <div style="font-size:.8rem;color:var(--muted);font-family:sans-serif;margin-top:.8rem;text-align:center">
+    Hover dots for question topics · Quadrant lines: refusal=30%, NVAS=0.60
+  </div>
+
+  <div class="two-col fi" style="margin-top:1.8rem">
+    <div class="card red-bd">
+      <div class="tag tag-r">Top-right quadrant · n=11</div>
+      <h3 style="margin-top:.5rem">Suppression failures</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Refusal ≥30%, NVAS ≥0.60. The model's internal distribution aligns with human data, but it refuses. Third-person framing partially unlocks these by shifting NVAS mean (though distributional JSD increases).</p>
+    </div>
+    <div class="card teal-bd">
+      <div class="tag tag-t">Bottom-left quadrant · n=9</div>
+      <h3 style="margin-top:.5rem">Representational bias</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Refusal &lt;30%, NVAS &lt;0.60. The model answers freely but diverges from human survey data. No gate exists to bypass. Prompt engineering cannot help here — training data intervention required.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ SAFETY TAX ═══════════════════════ -->
+<section id="tax">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">The Observable Cost</div>
+  <h2>The Safety <span class="red-txt">Tax</span></h2>
+  <p class="lead">Instruction-tuned models refuse T3 questions at 23.9% vs 12.4% for benign T1 — a mean safety tax of +11.5% (Cohen's d=0.303, p&lt;10⁻¹¹⁵). The distribution across models is highly unequal.</p>
+
+  <div class="fi" id="tax-chart" style="margin:1.5rem 0"></div>
+
+  <div class="two-col fi" style="margin-top:1.8rem">
+    <div class="card">
+      <h3>Scale ≠ Tax</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Spearman ρ=0.147 (p=0.464) between parameter count and safety tax. OLMo-32B-IT: +25.3% tax. GPT-5: −2.9% tax. Training recipe, not model size, determines suppression.</p>
+    </div>
+    <div class="card">
+      <h3>No single topic drives it</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Leave-one-topic-out across 7 topic groups (LGBTQ+, gender equality, violence, religious trust…): safety tax stays positive in all 7 conditions (+6.2% to +10.5%). The effect is general, not driven by one topic.</p>
+    </div>
+  </div>
+
+  <!-- OLMo scale comparison -->
+  <div class="fi" style="margin-top:2rem">
+    <h3>Larger models can have <em>larger</em> safety taxes</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif;margin-bottom:1rem">OLMo-3 7B vs 32B at IT stage: the 32B model has a <strong style="color:var(--text)">larger</strong> safety tax (25.3% vs 9.8%). Scale does not reduce and can amplify the gate.</p>
+    <div class="cvs-box" style="height:200px"><canvas id="scale-canvas"></canvas></div>
+  </div>
+</div>
+</section>
+</body></html>
+
+<!-- ═══════════════════════ COUNTRIES ═══════════════════════ -->
+<section id="countries" class="alt z1">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Inequitable Costs</div>
+  <h2>A 19.8% Gap Between <span class="red-txt">Best</span> and <span class="red-txt">Worst</span> Served Nations</h2>
+  <p class="lead">Algeria receives T3 NVAS of 0.532; Palestine receives 0.731. Crucially, Palestine also has the highest T3 refusal rate (0.352) — high accuracy AND high suppression together is the alignment veto signature.</p>
+  <div class="country-grid fi" id="country-grid"></div>
+  <p style="font-size:.78rem;color:var(--muted);font-family:sans-serif;margin-top:.6rem">Color: red=worst-served → teal=best-served. SAE ablation in Tulu-3-8B preferentially recovers worst-served countries (Algeria, Mauritania).</p>
+</div>
+</section>
+
+<!-- ═══════════════════════ FRAMING ═══════════════════════ -->
+<section id="framing" class="z1">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Practical Intervention</div>
+  <h2>Third-Person Framing: <span class="accent">2.6× Benefit</span> on T3</h2>
+  <p class="lead">Asking "How would an average [nationality] respond?" instead of "Imagine you are [nationality]…" reduces T3 refusals by 6.7pp and improves NVAS — but only for models with an active suppression gate.</p>
+
+  <!-- Animated framing comparison -->
+  <div class="cvs-box fi" style="height:300px;margin-bottom:1rem"><canvas id="framing-canvas"></canvas></div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--red2)"></span>Refusal rate</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>Mean NVAS</span>
+  </div>
+
+  <div class="fi" style="margin-top:1.8rem">
+    <table>
+      <thead><tr><th>Framing</th><th>T3 Refusal</th><th>Mean NVAS</th><th>T3 NVAS shift vs No-Mention</th></tr></thead>
+      <tbody>
+        <tr><td>No-Mention EN</td><td>22.3%</td><td>—</td><td>baseline</td></tr>
+        <tr><td>Persona EN</td><td>24.3% <span style="color:var(--red2);font-size:.75rem">↑ roleplaying MENA = more caution</span></td><td>0.684</td><td style="color:var(--gold)">+0.031</td></tr>
+        <tr><td>Persona Native</td><td>16.2%</td><td>0.665</td><td>+0.019</td></tr>
+        <tr class="hl"><td>Third-EN ✦</td><td style="color:var(--teal2)"><strong>17.6%</strong></td><td style="color:var(--teal2)"><strong>0.694</strong></td><td style="color:var(--teal2)"><strong>+0.081 (2.6×)</strong></td></tr>
+        <tr><td>Third-Native</td><td>16.4%</td><td>0.661</td><td>+0.033</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card gold-bd fi" style="margin-top:1.2rem">
+    <h3>⚠️ NVAS / JSD trade-off</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Third-EN improves mean NVAS (+0.081) but <em>increases</em> Jensen-Shannon divergence from human survey distributions (0.451 vs 0.435 for Persona-EN). Third framing concentrates probability mass on the correct mean, but <strong style="color:var(--text)">widens the distributional shape</strong> — it reduces the mean-accuracy gap while increasing distributional mismatch. Practitioners who need full distributional fidelity should treat the NVAS gain as partial.</p>
+  </div>
+
+  <!-- Per-model framing effect: who benefits? -->
+  <div class="fi" style="margin-top:2rem">
+    <h3>Only models with an active gate benefit from Third framing</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif;margin-bottom:.8rem">GPT-4o-mini (+0.155) and GPT-5 (+0.137) gain the most — they have strong safety gates. Base models gain near-zero.</p>
+    <div class="cvs-box" style="height:260px"><canvas id="framing-models-canvas"></canvas></div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ LANGUAGE ═══════════════════════ -->
+<section id="language" class="alt z1">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Native Language Backfires</div>
+  <h2>Arabic Prompting <span class="red-txt">Collapses</span> Country Identity</h2>
+  <p class="lead">Switching from English to Arabic/Persian/Turkish drops mean NVAS by −0.050 across all 26 models — including Arabic-specialized ones. Language script overrides country identity in residual-stream representations.</p>
+
+  <!-- PCA collapse animation -->
+  <div class="cvs-box fi" style="height:320px;margin-bottom:.8rem"><canvas id="pca-canvas"></canvas></div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--red2)"></span>Arabic-speaking countries (14) — collapse to 1 cluster in Arabic</span>
+    <span><span class="ldot" style="background:var(--blue2)"></span>Iran (Persian)</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>Turkey (Turkish)</span>
+  </div>
+
+  <!-- Language NVAS loss heatmap -->
+  <div class="fi" style="margin-top:2rem">
+    <h3>NVAS loss: switching English → native language (every cell negative)</h3>
+    <div class="hm-grid" id="lang-hm" style="grid-template-columns:auto 1fr 1fr 1fr;max-width:520px;margin:1rem auto">
+      <div class="hm-hdr"></div>
+      <div class="hm-hdr">Arabic</div>
+      <div class="hm-hdr">Persian</div>
+      <div class="hm-hdr">Turkish</div>
+      <div class="hm-row-lbl">Persona</div>
+      <div class="hm-cell" data-val="-0.016" id="hm00"></div>
+      <div class="hm-cell" data-val="-0.036" id="hm01"></div>
+      <div class="hm-cell" data-val="-0.054" id="hm02"></div>
+      <div class="hm-row-lbl">Third</div>
+      <div class="hm-cell" data-val="-0.033" id="hm10"></div>
+      <div class="hm-cell" data-val="-0.092" id="hm11"></div>
+      <div class="hm-cell" data-val="-0.076" id="hm12"></div>
+    </div>
+  </div>
+
+  <div class="two-col fi" style="margin-top:1.5rem">
+    <div class="card">
+      <h3>Arabic script dominates residual stream</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">SAE: best Arabic-script feature achieves F1=0.764–0.772 at 94% prevalence — fires on nearly every Arabic-script prompt regardless of which country is specified. Country-specific features reach only F1=0.13–0.21. Language overwhelms country.</p>
+    </div>
+    <div class="card">
+      <h3>Collapse statistics</h3>
+      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">66.5% of questions get identical answers across all 14 Arabic-speaking countries (vs 46.5% in English). Within-group std falls 33.5% (Observer) and 15.7% (Persona). Pairwise correlation: 0.814 → 0.884.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ MECHANISM ═══════════════════════ -->
+<section id="mechanism" class="z1">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Mechanistic Evidence</div>
+  <h2>A Candidate DPO-Stage Feature <span class="accent">Mediates Suppression</span></h2>
+  <p class="lead">In Tulu-3-8B, sparse autoencoder analysis identifies a single feature that activates 70× more on T3 items than T1, is installed by DPO, and when ablated shifts T3 logit predictions — with zero effect on benign content across 40 seeds.</p>
+
+  <!-- SAE meters -->
+  <div class="meter-grid fi" id="sae-meters">
+    <div class="meter" id="m-t1">
+      <div class="meter-fill" id="mf-t1" style="background:rgba(26,138,108,.15)"></div>
+      <div class="meter-content">
+        <div class="meter-label" style="color:var(--teal2)">T1 — Benign</div>
+        <span class="meter-pct" id="mp-t1" style="color:var(--teal2)">0%</span>
+        <div class="meter-desc">Veto feature activation<br/>0% in all 40 seeds</div>
+      </div>
+    </div>
+    <div class="meter" id="m-t2">
+      <div class="meter-fill" id="mf-t2" style="background:rgba(91,155,213,.15)"></div>
+      <div class="meter-content">
+        <div class="meter-label" style="color:var(--blue2)">T2 — Moderate</div>
+        <span class="meter-pct" id="mp-t2" style="color:var(--blue2)">&lt;0.4%</span>
+        <div class="meter-desc">Veto feature activation<br/>Near-zero, occasional</div>
+      </div>
+    </div>
+    <div class="meter" id="m-t3">
+      <div class="meter-fill" id="mf-t3" style="background:rgba(178,34,34,.18)"></div>
+      <div class="meter-content">
+        <div class="meter-label" style="color:var(--red2)">T3 — Sensitive</div>
+        <span class="meter-pct" id="mp-t3" style="color:var(--red2)">0%</span>
+        <div class="meter-desc">Veto feature activation<br/><strong>70× ratio vs T2</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SAE ablation animation -->
+  <div class="cvs-box fi" style="height:260px;margin:1.5rem 0"><canvas id="sae-ablation-canvas"></canvas></div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--red2)"></span>T3 logit prediction (shifts when feature ablated)</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>T1 logit prediction (stays ZERO across all 40 seeds)</span>
+  </div>
+
+  <div class="steps fi">
+    <div class="step"><span class="step-n">01</span><div class="step-t">TopK SAE</div><div class="step-b">F=8192 features, K=32. Layer-17 residual stream of Tulu-3-8B-IT (D=4096)</div></div>
+    <div class="step"><span class="step-n">02</span><div class="step-t">T3-Selective Feature</div><div class="step-b">F1=0.39–0.46. Fires on 28.6% of T3, &lt;0.4% of T2, 0% of T1. 70× ratio.</div></div>
+    <div class="step"><span class="step-n">03</span><div class="step-t">Ablation Effect</div><div class="step-b">Zero the feature → ΔŷT3=+0.250 mean (p=0.016) across 20 seeds. ΔŷT1=0.000 in all 40 seeds.</div></div>
+    <div class="step"><span class="step-n">04</span><div class="step-t">36.9σ Outlier</div><div class="step-b">Ablating 50 random features: mean Δ=0.000±0.001. Veto feature is 36.9σ above (p&lt;10⁻⁴).</div></div>
+    <div class="step"><span class="step-n">05</span><div class="step-t">DPO Installs It</div><div class="step-b">DPO result stronger (p=0.003) than IT (p=0.016). Circuit present before IT stage — DPO is the installation step.</div></div>
+  </div>
+
+  <!-- Logit lens layer animation -->
+  <div class="fi" style="margin-top:2.5rem">
+    <h3>Logit Lens: T3−T2 gap grows negative from layer 12 onward</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif;margin-bottom:.6rem">The logit-lens predicted digit gap (T3−T2) traces early neutrality then a deepening negative slope — DPO model reaches −0.672 at layer 17, more than double IT (−0.349). Gap magnitude correlates with safety tax across models (Spearman r=0.61, p&lt;0.01).</p>
+    <div class="cvs-box" style="height:280px"><canvas id="logit-lens-canvas"></canvas></div>
+    <div class="legend" style="margin-top:.6rem">
+      <span><span class="ldot" style="background:var(--red2)"></span>Tulu-3-8B-DPO (peak −0.672 at layer 17)</span>
+      <span><span class="ldot" style="background:var(--gold)"></span>Tulu-3-8B-IT (−0.349 at layer 17)</span>
+      <span><span class="ldot" style="background:rgba(255,255,255,.25)"></span>Base model (near 0)</span>
+    </div>
+  </div>
+
+  <!-- Residualized probing -->
+  <div class="fi" style="margin-top:2.5rem">
+    <h3>Residualized Probing: Early encoding, late inversion</h3>
+    <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif;margin-bottom:.6rem">Probing for cross-country cultural variation (after subtracting per-question means) shows a two-phase trajectory across all 7 tested models: early layers encode cultural signal (R²=+0.06–0.14), late layers counteract it (R² turns negative).</p>
+    <div class="cvs-box" style="height:260px"><canvas id="probe-canvas"></canvas></div>
+    <div class="legend" style="margin-top:.6rem">
+      <span><span class="ldot" style="background:var(--teal2)"></span>Early layers 2–3: cultural info enters (R²&gt;0)</span>
+      <span><span class="ldot" style="background:var(--red2)"></span>Late layers 28–31: alignment counteracts (R²&lt;0)</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ FRONTIER ═══════════════════════ -->
+<section id="frontier" class="alt z1">
+<div class="container">
+  <div class="divider"></div>
+  <div class="section-label">Frontier Models</div>
+  <h2>GPT-5 Shows the Trade-Off Is <span class="accent">Not Fixed</span></h2>
+  <p class="lead">There is a strong negative correlation (r=−0.61) between T3 refusal rate and T3 NVAS across all 26 models — models currently trade accuracy against refusal. GPT-5 alone occupies the top-right: high NVAS (0.756), near-zero safety tax (−2.9%).</p>
+  <div class="scatter-wrap fi" style="height:380px"><canvas id="frontier-canvas"></canvas></div>
+  <div class="legend">
+    <span><span class="ldot" style="background:var(--blue2)"></span>OLMo family</span>
+    <span><span class="ldot" style="background:var(--teal2)"></span>Arabic-specialized</span>
+    <span><span class="ldot" style="background:var(--gold)"></span>GPT-4o-mini</span>
+    <span><span class="ldot" style="background:#ff6b6b"></span>GPT-5 ★</span>
+    <span><span class="ldot" style="background:var(--purple2)"></span>Gemma / Qwen / Other</span>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ DATA ═══════════════════════ -->
+<section id="data" class="z1">
+<div class="container">
+  <div class="divider"></div>
+  <h2>Data &amp; <span class="accent">Code</span></h2>
+  <div class="two-col fi">
+    <div class="card">
+      <div class="tag tag-g" style="margin-bottom:.6rem">🤗 HuggingFace Dataset</div>
+      <h3><a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses" style="color:var(--gold2);text-decoration:none">alignment-veto-responses</a></h3>
+      <ul style="padding-left:1.1rem;color:var(--muted);font-family:sans-serif;font-size:.83rem;margin-top:.5rem">
+        <li>~1.53M model responses (27 XLSX files)</li>
+        <li>26 models · 864 questions · 16 countries</li>
+        <li>6 framings · English + native languages</li>
+        <li>NVAS, EV-NVAS, refusal labels per row</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="tag tag-g" style="margin-bottom:.6rem">💻 GitHub</div>
+      <h3><a href="https://github.com/pardissz/alignment-veto" style="color:var(--gold2);text-decoration:none">pardissz/alignment-veto</a></h3>
+      <ul style="padding-left:1.1rem;color:var(--muted);font-family:sans-serif;font-size:.83rem;margin-top:.5rem">
+        <li>analysis/ — NVAS, framing, native language</li>
+        <li>mechanistic/ — SAE, probing, logit lens</li>
+        <li>experiments/ — parallel inference scripts</li>
+        <li>figures/ — all paper figure generators</li>
+      </ul>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════ CITE ═══════════════════════ -->
+<section id="cite" class="alt z1">
+<div class="container">
+  <div class="divider"></div>
+  <h2>Citation</h2>
+  <pre>@article{zahraei2026alignmentveto,
+  title   = {The Alignment Veto: How Safety Training Suppresses Cultural Knowledge in LLMs},
+  author  = {Zahraei, Pardis Sadat and Nazar, Nizi and Asgari, Ehsaneddin},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+</div>
+</section>
+
+<footer class="z1">
+  <p>The Alignment Veto · 2026 · <a href="https://github.com/pardissz/alignment-veto">GitHub</a> · <a href="https://huggingface.co/datasets/PardisSzah/alignment-veto-responses">HuggingFace</a></p>
+</footer>
 <script>
-/* ── Starfield ── */
-(function(){
-  const c=document.getElementById('starfield'),ctx=c.getContext('2d');
+/* ═══════ UTILITIES ═══════ */
+function lerp(a,b,t){return a+(b-a)*t}
+function easeOut(t){return 1-Math.pow(1-t,3)}
+function easeInOut(t){return t<.5?4*t*t*t:(t-1)*(2*t-2)*(2*t-2)+1}
+function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
+function hexAlpha(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`}
+
+const C={gold:'#C8960C',gold2:'#F0B730',red:'#b22222',red2:'#e74c3c',teal:'#1A8A6C',teal2:'#27AE60',blue:'#1a5a9a',blue2:'#5B9BD5',muted:'rgba(122,138,170,',text:'#e8ecf4',bg:'#07091a'};
+function resizeCanvas(c,wrap){
+  const r=window.devicePixelRatio||1;
+  const w=wrap.clientWidth,h=wrap.clientHeight;
+  c.width=w*r;c.height=h*r;
+  c.style.width=w+'px';c.style.height=h+'px';
+  c.getContext('2d').scale(r,r);
+  return{w,h};
+}
+
+/* ═══════ STARFIELD ═══════ */
+(()=>{
+  const c=document.getElementById('bg-canvas');
+  const ctx=c.getContext('2d');
   let W,H,stars=[];
   function resize(){W=c.width=innerWidth;H=c.height=innerHeight}
-  function mkStars(){stars=Array.from({length:200},()=>({
-    x:Math.random()*W,y:Math.random()*H,
-    r:Math.random()*1.2+.3,
-    s:Math.random()*.3+.1,
-    o:Math.random()*.7+.3
-  }))}
+  function init(){stars=Array.from({length:250},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.1+.2,sp:Math.random()*.25+.08,o:Math.random()*.7+.2}))}
   function draw(){
     ctx.clearRect(0,0,W,H);
+    const now=Date.now()/1000;
     stars.forEach(s=>{
-      s.o+=s.s*.01;if(s.o>1||s.o<.3)s.s*=-1;
+      const o=s.o+.3*Math.sin(now*s.sp+s.x);
       ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,6.28);
-      ctx.fillStyle=`rgba(200,180,100,${s.o})`;ctx.fill();
+      ctx.fillStyle=`rgba(200,180,100,${clamp(o,0.05,.9)})`;ctx.fill();
     });
     requestAnimationFrame(draw);
   }
-  resize();mkStars();draw();
-  window.addEventListener('resize',()=>{resize();mkStars()});
+  resize();init();draw();
+  window.addEventListener('resize',()=>{resize();init()});
 })();
 
-/* ── Fade-in observer ── */
-const io=new IntersectionObserver(entries=>{
-  entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');io.unobserve(e.target)}});
-},{threshold:.1});
-document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
+/* ═══════ INTERSECTION OBSERVER + COUNTER ═══════ */
+const io=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting){x.target.classList.add('vis');io.unobserve(x.target)}})},{threshold:.1});
+document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
-/* ── Counter animation ── */
-function animateCounters(){
-  document.querySelectorAll('[data-target]').forEach(el=>{
-    const target=+el.dataset.target;
-    const pct=el.dataset.pct;
-    const suffix=el.dataset.suffix;
-    let start=null;
-    const dur=1800;
+(()=>{
+  function animNum(el){
+    const to=+el.dataset.to,pct=el.dataset.pct,sfx=el.dataset.sfx||'';
+    let s=null;
     function step(ts){
-      if(!start)start=ts;
-      const p=Math.min((ts-start)/dur,1);
-      const ease=1-Math.pow(1-p,3);
-      let val=Math.round(target*ease);
-      if(suffix==='M') el.textContent=(val/1000000).toFixed(2)+'M';
-      else if(pct) el.textContent=(val/10).toFixed(1)+'%';
-      else el.textContent=val.toLocaleString();
+      if(!s)s=ts;
+      const p=easeOut(clamp((ts-s)/1600,0,1));
+      const v=Math.round(to*p);
+      el.textContent=pct?(v/10).toFixed(1)+'%':v.toLocaleString()+sfx;
       if(p<1)requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
-  });
-}
-const statsObserver=new IntersectionObserver(entries=>{
-  if(entries[0].isIntersecting){animateCounters();statsObserver.disconnect()}
-},{threshold:.3});
-statsObserver.observe(document.querySelector('.stats-grid'));
+  }
+  const statsObs=new IntersectionObserver(e=>{
+    if(!e[0].isIntersecting)return;
+    document.querySelectorAll('[data-to]').forEach(animNum);
+    statsObs.disconnect();
+  },{threshold:.3});
+  const sg=document.getElementById('hero-stats');
+  if(sg)statsObs.observe(sg);
+})();
 
-/* ── Veto Canvas Animation ── */
-(function(){
-  const canvas=document.getElementById('veto-canvas');
-  const wrap=document.getElementById('veto-canvas-wrap');
-  const ctx=canvas.getContext('2d');
-  let W,H,t=0;
-  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
+/* ═══════ CONCEPT ANIMATION ═══════ */
+(()=>{
+  const wrap=document.getElementById('concept-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0;
+  function resize(){dim=resizeCanvas(c,wrap)}
   resize();window.addEventListener('resize',resize);
 
-  /* Color palette */
-  const C={teal:'#1A8A6C',red:'#c0392b',gold:'#C8960C',blue:'#2980b9',muted:'rgba(136,153,184,0.5)'};
-
-  function drawGaussian(ctx,cx,cy,sigma,amplitude,color,label){
-    ctx.beginPath();
-    for(let x=cx-sigma*3.5;x<=cx+sigma*3.5;x+=.5){
-      const y=cy-amplitude*Math.exp(-0.5*((x-cx)/sigma)**2);
+  function gaussian(ctx,cx,cy,sigma,amp,color,lw=2){
+    ctx.save();ctx.beginPath();
+    for(let x=cx-sigma*3.5;x<=cx+sigma*3.5;x+=1){
+      const y=cy-amp*Math.exp(-0.5*((x-cx)/sigma)**2);
       x===cx-sigma*3.5?ctx.moveTo(x,y):ctx.lineTo(x,y);
     }
-    ctx.strokeStyle=color;ctx.lineWidth=2.5;ctx.stroke();
-    if(label){
-      ctx.fillStyle=color;ctx.font='11px sans-serif';ctx.textAlign='center';
-      ctx.fillText(label,cx,cy-amplitude-10);
-    }
+    ctx.strokeStyle=color;ctx.lineWidth=lw;ctx.stroke();ctx.restore();
   }
 
   function frame(){
-    ctx.clearRect(0,0,W,H);
+    const {w,h}=dim;
+    ctx.clearRect(0,0,w,h);
     t+=.012;
 
-    const midY=H/2;
-    const gateX=W*.55;
-    const sigma=W*.045;
+    const gateX=w*.56,midY=h*.52,sigma=w*.052;
 
-    /* Background regions */
-    ctx.fillStyle='rgba(26,138,108,0.04)';
-    ctx.fillRect(0,0,gateX,H);
-    ctx.fillStyle='rgba(192,57,43,0.04)';
-    ctx.fillRect(gateX,0,W-gateX,H);
+    /* regions */
+    ctx.fillStyle='rgba(26,138,108,.04)';ctx.fillRect(0,0,gateX,h);
+    ctx.fillStyle='rgba(178,34,34,.04)';ctx.fillRect(gateX,0,w-gateX,h);
 
-    /* Labels */
-    ctx.font='11px monospace';ctx.fillStyle='rgba(136,153,184,0.6)';
-    ctx.textAlign='center';
-    ctx.fillText('INTERNAL REPRESENTATIONS',gateX*.5,22);
-    ctx.fillText('EXPRESSED OUTPUT',gateX+(W-gateX)*.5,22);
+    /* labels */
+    ctx.font=`${Math.max(10,w*.013)}px monospace`;ctx.fillStyle='rgba(122,138,170,.6)';ctx.textAlign='center';
+    ctx.fillText('INSIDE THE MODEL',gateX*.48,h*.1);
+    ctx.fillText('EXPRESSED OUTPUT',gateX+(w-gateX)*.5,h*.1);
 
-    /* Gate */
-    const gateFlicker=.85+.15*Math.sin(t*3);
-    ctx.fillStyle=`rgba(41,128,185,${gateFlicker*.4})`;
-    ctx.fillRect(gateX-4,H*.1,8,H*.8);
-    ctx.fillStyle=`rgba(41,128,185,${gateFlicker})`;
-    ctx.font='bold 11px sans-serif';ctx.textAlign='center';
-    ctx.fillText('ALIGNMENT',gateX,H*.1-14);
-    ctx.fillText('GATE',gateX,H*.1-2);
+    /* human ground truth - gold */
+    const hx=gateX*.35;
+    gaussian(ctx,hx,midY,sigma,h*.28,C.gold2,2.5);
+    ctx.fillStyle=C.gold2;ctx.font=`bold ${Math.max(9,w*.011)}px sans-serif`;ctx.textAlign='center';
+    ctx.fillText('Human survey',hx,midY-h*.3);
 
-    /* Internal distribution — teal, close to gold (human) */
-    const internalOffset=25*Math.sin(t*.2);
-    const humanCenter=gateX*.38;
-    const humanX=humanCenter;
+    /* internal logits - teal, very close to human */
+    const tiltOff=6*Math.sin(t*.18);
+    gaussian(ctx,hx+tiltOff,midY+4,sigma*1.08,h*.24,C.teal2,2.2);
+    ctx.fillStyle=C.teal2;ctx.fillText('Internal logits at refusal',hx+tiltOff,midY-h*.25);
+    ctx.font=`${Math.max(9,w*.01)}px monospace`;ctx.fillStyle='rgba(39,174,96,.7)';
+    ctx.fillText('EV-NVAS = 0.718',hx+tiltOff,midY+h*.2);
 
-    /* Human ground truth — gold */
-    drawGaussian(ctx,humanX,midY+10,sigma*.9,H*.25,C.gold,'Human Survey');
+    /* gate */
+    const gFlick=.8+.2*Math.sin(t*3.5);
+    const gGrad=ctx.createLinearGradient(gateX-6,0,gateX+6,0);
+    gGrad.addColorStop(0,'transparent');gGrad.addColorStop(.5,`rgba(91,155,213,${gFlick*.6})`);gGrad.addColorStop(1,'transparent');
+    ctx.fillStyle=gGrad;ctx.fillRect(gateX-6,h*.1,12,h*.8);
+    ctx.fillStyle=`rgba(91,155,213,${gFlick})`;ctx.font=`bold ${Math.max(10,w*.012)}px sans-serif`;ctx.textAlign='center';
+    ctx.fillText('⊘',gateX,midY*.8);
+    ctx.font=`${Math.max(8,w*.009)}px monospace`;ctx.fillText('ALIGNMENT',gateX,h*.14);ctx.fillText('GATE',gateX,h*.18);
 
-    /* Internal logits — teal, slightly shifted */
-    const intShift=8*Math.sin(t*.15);
-    drawGaussian(ctx,humanX+intShift,midY+10,sigma,H*.22,C.teal,'Internal Logits');
-
-    /* Expressed answer — red, far from human */
-    const outputX=gateX+(W-gateX)*.45;
-    const expressedShift=W*.12*Math.sin(t*.1+1);
-    drawGaussian(ctx,outputX+expressedShift,midY+10,sigma*.85,H*.2,C.red,'Expressed Answer');
-
-    /* Animated particles representing signal being blocked */
-    for(let i=0;i<6;i++){
-      const phase=t+i*1.05;
-      const px=humanX + (gateX-humanX-20)*((phase % 2)/2);
-      const py=midY+20+Math.sin(phase*4+i)*20;
-      const alpha=1-((phase%2)/2);
-      if(px<gateX-15){
+    /* travelling particles (signal hitting gate) */
+    for(let i=0;i<5;i++){
+      const phase=(t+i*1.2)%2.4;
+      const px=hx+(gateX-20-hx)*(phase/2.4);
+      const py=midY+15+20*Math.sin(phase*3+i*1.1);
+      const alpha=1-(phase/2.4);
+      if(px<gateX-10){
         ctx.beginPath();ctx.arc(px,py,3,0,6.28);
-        ctx.fillStyle=`rgba(26,138,108,${alpha*.8})`;ctx.fill();
+        ctx.fillStyle=`rgba(39,174,96,${alpha*.85})`;ctx.fill();
       }
     }
 
-    /* Blocked signal flash at gate */
-    const blockAlpha=.4+.3*Math.sin(t*4);
-    ctx.beginPath();ctx.arc(gateX,midY,16,0,6.28);
-    ctx.strokeStyle=`rgba(41,128,185,${blockAlpha})`;ctx.lineWidth=1.5;ctx.stroke();
-    ctx.font='bold 16px sans-serif';ctx.textAlign='center';ctx.fillStyle=`rgba(41,128,185,${blockAlpha+.2})`;
-    ctx.fillText('⊘',gateX,midY+6);
+    /* expressed output - red, pushed away from human */
+    const ox=gateX+(w-gateX)*.42;
+    const skewOff=w*.09*Math.sin(t*.08);
+    gaussian(ctx,ox+skewOff,midY,sigma*.85,h*.2,C.red2,2);
+    ctx.fillStyle=C.red2;ctx.font=`bold ${Math.max(9,w*.011)}px sans-serif`;ctx.textAlign='center';
+    ctx.fillText('Expressed answer',ox+skewOff,midY-h*.22);
+    ctx.font=`${Math.max(9,w*.01)}px monospace`;ctx.fillStyle='rgba(231,76,60,.7)';
+    ctx.fillText('NVAS = 0.690',ox+skewOff,midY+h*.2);
+    ctx.fillText('↑ skews Western defaults',ox+skewOff,midY+h*.26);
 
-    /* Correlation annotation */
-    ctx.fillStyle='rgba(200,150,12,0.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Internal ≈ Human (r>0, p<10⁻¹³)',humanX,H-18);
-
-    ctx.fillStyle='rgba(192,57,43,0.7)';ctx.textAlign='center';
-    ctx.fillText('Output skews Western defaults',outputX,H-18);
+    /* Δ annotation */
+    ctx.strokeStyle='rgba(200,150,12,.4)';ctx.lineWidth=1;ctx.setLineDash([4,4]);
+    ctx.beginPath();ctx.moveTo(hx,midY+h*.16);ctx.lineTo(ox+skewOff,midY+h*.16);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C.gold2;ctx.font=`${Math.max(9,w*.01)}px sans-serif`;ctx.textAlign='center';
+    ctx.fillText('Δ = +0.029  (p < 10⁻¹³)',  (hx+ox)/2, midY+h*.13);
 
     requestAnimationFrame(frame);
   }
   frame();
 })();
 
-/* ── Safety Tax Bar Chart ── */
-(function(){
-  const data=[
-    {label:'ALLAM-7B-IT',    val:37.6,color:'#c0392b'},
-    {label:'OLMo-32B-IT',    val:25.3,color:'#e74c3c'},
-    {label:'Tulu-3.1-8B',    val:18.1,color:'#e67e22'},
-    {label:'LLaMA-3.1-8B-IT',val:14.2,color:'#f39c12'},
-    {label:'Gemma-3-27B-IT', val:13.0,color:'#f1c40f'},
-    {label:'AYA-32B',        val:11.5,color:'#d4ac0d'},
-    {label:'Qwen2.5-7B-IT',  val: 8.3,color:'#27ae60'},
-    {label:'GPT-4o-mini',    val: 6.1,color:'#1abc9c'},
-    {label:'GPT-5',          val:-2.9,color:'#16a085'},
+/* ═══════ SUPPRESSION SCATTER (19/24 above diagonal) ═══════ */
+(()=>{
+  const wrap=document.querySelector('#concept .scatter-wrap');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},revealed=false,revealP=0;
+
+  /* 24 model data: [name, accepted_NVAS, refused_EV-NVAS, family, above_diag] */
+  const models=[
+    ['ALLAM-7B',0.661,0.711,'arabic',true],['AYA-32B',0.672,0.718,'arabic',true],
+    ['AYA-8B',0.678,0.712,'arabic',true],['FANAR-1.9B',0.681,0.698,'arabic',true],
+    ['Jais-2-8B',0.674,0.695,'arabic',true],['OLMo-7B-IT',0.681,0.714,'olmo',true],
+    ['OLMo-32B-IT',0.667,0.722,'olmo',true],['OLMo-7B-DPO',0.670,0.708,'olmo',true],
+    ['OLMo-32B-DPO',0.668,0.705,'olmo',true],['Tulu-3.1-8B',0.688,0.709,'tulu',true],
+    ['Tulu-3-DPO',0.685,0.706,'tulu',true],['LLaMA-8B-IT',0.692,0.715,'llama',true],
+    ['Gemma-27B-IT',0.698,0.724,'gemma',true],['Gemma-12B-IT',0.694,0.712,'gemma',true],
+    ['Gemma-4B-IT',0.688,0.700,'gemma',true],['Qwen3-30B',0.701,0.718,'qwen',true],
+    ['Qwen3-4B',0.697,0.714,'qwen',true],['Qwen2.5-7B',0.695,0.708,'qwen',true],
+    ['GPT-4o-mini',0.695,0.726,'gpt',true],['GPT-5',0.756,0.771,'gpt',true],
+    ['OLMo-7B-SFT',0.699,0.693,'olmo',false],['OLMo-32B-SFT',0.698,0.690,'olmo',false],
+    ['Tulu-3-SFT',0.702,0.697,'tulu',false],['LLaMA-8B-Base',0.693,0.685,'llama',false],
   ];
-  const chart=document.getElementById('tax-chart');
-  data.forEach(d=>{
-    const maxPos=40;
-    const pct=Math.max(d.val,0)/maxPos*100;
-    const row=document.createElement('div');row.className='bar-row';
-    row.innerHTML=`<div class="bar-label">${d.label}</div>
-      <div class="bar-track"><div class="bar-fill" style="background:${d.color}" data-width="${pct}%"></div></div>
-      <div class="bar-val" style="color:${d.color}">${d.val>0?'+':''}${d.val}%</div>`;
-    chart.appendChild(row);
-  });
-  const barObs=new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting){
-      document.querySelectorAll('.bar-fill').forEach(b=>{b.style.width=b.dataset.width});
-      barObs.disconnect();
-    }
-  },{threshold:.3});
-  barObs.observe(chart);
-})();
+  const famCol={'arabic':C.teal2,'olmo':C.blue2,'tulu':'#9b59b6','llama':'#e67e22','gemma':'#16a085','qwen':'#8e44ad','gpt':C.gold2};
 
-/* ── Country grid ── */
-(function(){
-  const countries=[
-    {name:'Palestine',nvas:0.731,refusal:0.352},
-    {name:'Turkey',   nvas:0.718,refusal:0.195},
-    {name:'Iran',     nvas:0.712,refusal:0.288},
-    {name:'Tunisia',  nvas:0.709,refusal:0.241},
-    {name:'Jordan',   nvas:0.707,refusal:0.313},
-    {name:'Morocco',  nvas:0.703,refusal:0.261},
-    {name:'Egypt',    nvas:0.698,refusal:0.225},
-    {name:'Kuwait',   nvas:0.695,refusal:0.279},
-    {name:'Iraq',     nvas:0.692,refusal:0.304},
-    {name:'Lebanon',  nvas:0.688,refusal:0.271},
-    {name:'Libya',    nvas:0.674,refusal:0.248},
-    {name:'Sudan',    nvas:0.651,refusal:0.292},
-    {name:'Qatar',    nvas:0.641,refusal:0.335},
-    {name:'Saudi Arabia',nvas:0.629,refusal:0.319},
-    {name:'Mauritania',nvas:0.587,refusal:0.268},
-    {name:'Algeria',  nvas:0.532,refusal:0.242},
-  ];
-
-  function nvasColor(v){
-    /* 0.53 → red, 0.73 → teal */
-    const t=(v-0.52)/(0.74-0.52);
-    const r=Math.round(192+(26-192)*t);
-    const g=Math.round(57+(138-57)*t);
-    const b=Math.round(43+(108-43)*t);
-    return `rgb(${r},${g},${b})`;
-  }
-
-  const grid=document.getElementById('country-grid');
-  countries.forEach(c=>{
-    const col=nvasColor(c.nvas);
-    const card=document.createElement('div');
-    card.className='country-card';
-    card.style.background=`rgba(${c.nvas>0.65?'26,138,108':'192,57,43'},.08)`;
-    card.style.border=`1px solid ${col}44`;
-    const best=c.name==='Palestine',worst=c.name==='Algeria';
-    card.innerHTML=`
-      <div class="country-name">${c.name} ${best?'<span class="tag tag-best">Best</span>':worst?'<span class="tag tag-worst">Worst</span>':''}
-      </div>
-      <div class="country-score" style="color:${col}">${c.nvas.toFixed(3)}</div>
-      <div class="country-bar" style="background:${col};width:${((c.nvas-0.5)/(0.75-0.5)*100).toFixed(0)}%"></div>
-      <div style="font-size:.7rem;color:rgba(136,153,184,.7);font-family:sans-serif;margin-top:.3rem">refusal: ${(c.refusal*100).toFixed(1)}%</div>
-    `;
-    grid.appendChild(card);
-  });
-})();
-
-/* ── Language PCA canvas ── */
-(function(){
-  const canvas=document.getElementById('lang-canvas');
-  const wrap=document.getElementById('lang-canvas-wrap');
-  const ctx=canvas.getContext('2d');
-  let W,H,t=0;
-  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
+  function resize(){dim=resizeCanvas(c,wrap)}
   resize();window.addEventListener('resize',resize);
 
-  const arabicCountries=['Algeria','Egypt','Iraq','Jordan','Kuwait','Lebanon',
-    'Libya','Mauritania','Morocco','Palestine','Qatar','Saudi Arabia','Sudan','Tunisia'];
-  const seeds=[.2,.5,.8,.15,.65,.35,.9,.45,.7,.25,.55,.3,.75,.4];
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revealed=true;obs.disconnect();}},{threshold:.3});
+  obs.observe(wrap);
 
-  /* English: spread across space */
-  const engPositions=arabicCountries.map((_,i)=>{
-    const angle=(i/14)*Math.PI*1.8+.3;
-    const r=.22+seeds[i]*.15;
-    return {x:.5+r*Math.cos(angle),y:.5+r*Math.sin(angle)};
-  });
-  const iranEng={x:.15,y:.35};
-  const turkeyEng={x:.82,y:.25};
-
-  /* Arabic: all collapse to center-left */
-  const collapseCenter={x:.38,y:.5};
-  const iranAr={x:.15,y:.35};
-  const turkeyAr={x:.82,y:.25};
-
-  function lerp(a,b,t){return a+(b-a)*t}
-  function easeInOut(t){return t<.5?2*t*t:1-(-2*t+2)**2/2}
-
-  function frame(){
-    ctx.clearRect(0,0,W,H);
-    t+=.004;
-
-    /* Oscillate between English and Arabic layout */
-    const phase=(Math.sin(t)+1)/2;
-    const progress=easeInOut(phase);
-
-    /* Background labels */
-    ctx.font='11px monospace';ctx.fillStyle='rgba(136,153,184,.5)';
-    ctx.textAlign='left';
-    ctx.fillText('Prompting language: '+(progress<0.5?'English →':'← Arabic'),W*.05,H*.08);
-
-    const spread=1-progress*.9;
-
-    arabicCountries.forEach((name,i)=>{
-      const ex=engPositions[i].x,ey=engPositions[i].y;
-      const ax=collapseCenter.x+(seeds[i]-.5)*.06*spread;
-      const ay=collapseCenter.y+(seeds[(i+3)%14]-.5)*.06*spread;
-      const x=lerp(ex,ax,progress)*W;
-      const y=lerp(ey,ay,progress)*H;
-
-      const alpha=.7+.3*(1-progress);
-      ctx.beginPath();ctx.arc(x,y,5,0,6.28);
-      ctx.fillStyle=`rgba(220,50,50,${alpha})`;ctx.fill();
-
-      if(progress<0.4||i===0){
-        ctx.fillStyle=`rgba(220,100,100,${.6*(1-progress*.8)})`;
-        ctx.font='9px sans-serif';ctx.textAlign='center';
-        ctx.fillText(name,x,y-8);
-      }
+  let hovModel=null;
+  wrap.addEventListener('mousemove',e=>{
+    const rect=wrap.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const{w,h}=dim,pad=50;
+    const xRange=[.63,.78],yRange=[.63,.78];
+    hovModel=null;
+    models.forEach(m=>{
+      const px=pad+(m[1]-xRange[0])/(xRange[1]-xRange[0])*(w-pad*2);
+      const py=h-pad-(m[2]-yRange[0])/(yRange[1]-yRange[0])*(h-pad*2);
+      if(Math.hypot(mx-px,my-py)<12)hovModel=m;
     });
-
-    /* Show collapse annotation */
-    if(progress>0.6){
-      const cx=collapseCenter.x*W,cy=collapseCenter.y*H;
-      const a=(progress-.6)/.4;
-      ctx.beginPath();ctx.arc(cx,cy,30*a+10,0,6.28);
-      ctx.strokeStyle=`rgba(220,50,50,${a*.5})`;ctx.lineWidth=1.5;ctx.stroke();
-      ctx.fillStyle=`rgba(220,50,50,${a})`;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-      ctx.fillText('14 countries → 1 cluster',cx,cy+50*a);
-      ctx.fillText(`${(66.5*a).toFixed(0)}% identical responses`,cx,cy+64*a);
-    }
-
-    /* Iran — always separate */
-    function drawCountry(pos,name,color){
-      ctx.beginPath();ctx.arc(pos.x*W,pos.y*H,5,0,6.28);
-      ctx.fillStyle=color;ctx.fill();
-      ctx.fillStyle=color;ctx.font='9px sans-serif';ctx.textAlign='center';
-      ctx.fillText(name,pos.x*W,pos.y*H-10);
-    }
-    drawCountry(iranAr,'Iran (Persian)','rgba(41,128,185,.9)');
-    drawCountry(turkeyAr,'Turkey (Turkish)','rgba(39,174,96,.9)');
-
-    /* Legend */
-    ctx.font='9px sans-serif';ctx.fillStyle='rgba(136,153,184,.7)';ctx.textAlign='left';
-    ctx.fillText('● Arabic-speaking (collapse)',W*.05,H*.93);
-    ctx.fillStyle='rgba(41,128,185,.8)';ctx.fillText('● Persian (separate)',W*.05,H*.93+14);
-    ctx.fillStyle='rgba(39,174,96,.8)';ctx.fillText('● Turkish (separate)',W*.35,H*.93+14);
-
-    requestAnimationFrame(frame);
-  }
-  frame();
-})();
-
-/* ── SAE percent counter ── */
-(function(){
-  const el=document.querySelector('[data-target-pct="28.6"]');
-  if(!el)return;
-  const obs=new IntersectionObserver(entries=>{
-    if(!entries[0].isIntersecting)return;
-    let start=null;
-    function step(ts){
-      if(!start)start=ts;
-      const p=Math.min((ts-start)/1500,1);
-      const ease=1-Math.pow(1-p,3);
-      el.textContent=(28.6*ease).toFixed(1)+'%';
-      if(p<1)requestAnimationFrame(step);
-    }
-    requestAnimationFrame(step);
-    obs.disconnect();
-  },{threshold:.5});
-  obs.observe(el);
-})();
-
-/* ── Probe canvas ── */
-(function(){
-  const canvas=document.getElementById('probe-canvas');
-  const wrap=document.getElementById('probe-canvas-wrap');
-  const ctx=canvas.getContext('2d');
-  let W,H;
-  function resize(){W=canvas.width=wrap.clientWidth;H=canvas.height=wrap.clientHeight}
-  resize();window.addEventListener('resize',resize);
-
-  /* Approximate residualized R2 trajectory across 32 layers */
-  const layers=32;
-  /* Early: positive; middle: near 0; late: negative */
-  function r2(i){
-    if(i<4) return .06+.08*(i/4);
-    if(i<8) return .14-.14*((i-4)/4);
-    if(i<20) return -.02+.01*Math.sin(i*.4);
-    return -.04-.06*((i-20)/12);
-  }
+  });
 
   let t=0;
   function frame(){
-    ctx.clearRect(0,0,W,H);
-    t+=.01;
+    const{w,h}=dim;
+    ctx.clearRect(0,0,w,h);
+    t+=.016;
+    if(revealed&&revealP<1)revealP=Math.min(1,revealP+.025);
+    const pad=50,xRange=[.63,.78],yRange=[.63,.78];
+    const toX=v=>pad+(v-xRange[0])/(xRange[1]-xRange[0])*(w-pad*2);
+    const toY=v=>h-pad-(v-yRange[0])/(yRange[1]-yRange[0])*(h-pad*2);
 
-    const padL=50,padR=20,padT=30,padB=40;
-    const plotW=W-padL-padR,plotH=H-padT-padB;
-    const midY=padT+plotH*.5;
-
-    /* Grid */
+    /* grid */
     ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
-    for(let i=0;i<=4;i++){
-      const y=padT+plotH*(i/4);
-      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(W-padR,y);ctx.stroke();
+    for(let i=0;i<=5;i++){
+      const xv=xRange[0]+i*(xRange[1]-xRange[0])/5;
+      const yv=yRange[0]+i*(yRange[1]-yRange[0])/5;
+      ctx.beginPath();ctx.moveTo(toX(xv),pad);ctx.lineTo(toX(xv),h-pad);ctx.stroke();
+      ctx.beginPath();ctx.moveTo(pad,toY(yv));ctx.lineTo(w-pad,toY(yv));ctx.stroke();
     }
 
-    /* Zero line */
-    ctx.strokeStyle='rgba(255,255,255,.15)';ctx.lineWidth=1.5;
-    ctx.beginPath();ctx.moveTo(padL,midY);ctx.lineTo(W-padR,midY);ctx.stroke();
-
-    /* Axes labels */
-    ctx.fillStyle='rgba(136,153,184,.6)';ctx.font='10px sans-serif';
-    ctx.textAlign='center';ctx.fillText('Layer',W/2,H-4);
-    ctx.textAlign='right';ctx.fillText('+0.14',padL-4,padT+8);
-    ctx.fillText('0',padL-4,midY+4);
-    ctx.fillText('−0.10',padL-4,H-padB-4);
-    ctx.textAlign='left';ctx.fillText('Residualised R²',padL+4,padT+14);
-
-    /* Phase annotations */
-    const earlyAlpha=.6+.2*Math.sin(t);
-    ctx.fillStyle=`rgba(26,138,108,${earlyAlpha})`;ctx.font='9px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Cultural info enters',padL+plotW*.12,padT+10);
-    const lateAlpha=.6+.2*Math.sin(t+1);
-    ctx.fillStyle=`rgba(192,57,43,${lateAlpha})`;
-    ctx.fillText('Alignment counteracts',padL+plotW*.82,H-padB-24);
-
-    /* Curve */
+    /* diagonal y=x */
+    ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=1.5;ctx.setLineDash([6,4]);
     ctx.beginPath();
-    for(let i=0;i<layers;i++){
-      const x=padL+plotW*(i/(layers-1));
-      const v=r2(i);
-      const y=midY-v*plotH*3;
-      i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-    }
-    const grad=ctx.createLinearGradient(padL,0,W-padR,0);
-    grad.addColorStop(0,'rgba(26,138,108,.8)');
-    grad.addColorStop(.35,'rgba(200,150,12,.6)');
-    grad.addColorStop(1,'rgba(192,57,43,.8)');
-    ctx.strokeStyle=grad;ctx.lineWidth=2.5;ctx.stroke();
+    const dMin=Math.max(xRange[0],yRange[0]),dMax=Math.min(xRange[1],yRange[1]);
+    ctx.moveTo(toX(dMin),toY(dMin));ctx.lineTo(toX(dMax),toY(dMax));ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.font='10px sans-serif';ctx.textAlign='left';
+    ctx.fillText('EV-NVAS = NVAS',toX(dMin)+4,toY(dMin)-6);
 
-    /* Dots at notable layers */
-    [[2,r2(2),'rgba(26,138,108,1)','L2'],[30,r2(30),'rgba(192,57,43,1)','L30']].forEach(([i,v,col,lbl])=>{
-      const x=padL+plotW*(i/(layers-1));
-      const y=midY-v*plotH*3;
-      ctx.beginPath();ctx.arc(x,y,5,0,6.28);ctx.fillStyle=col;ctx.fill();
-      ctx.fillStyle=col;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-      ctx.fillText(lbl,x,y+(v>0?-10:14));
+    /* axes labels */
+    ctx.fillStyle='rgba(122,138,170,.8)';ctx.font='11px sans-serif';
+    ctx.textAlign='center';ctx.fillText('Accepted T3 NVAS',w/2,h-8);
+    ctx.save();ctx.translate(14,h/2);ctx.rotate(-Math.PI/2);
+    ctx.fillText('Refused T3 EV-NVAS',0,0);ctx.restore();
+
+    /* title annotation */
+    ctx.fillStyle=C.teal2;ctx.font='bold 11px sans-serif';ctx.textAlign='left';
+    ctx.fillText('19/24 above diagonal →',toX(.666),toY(.755));
+
+    /* points */
+    models.forEach((m,i)=>{
+      const delay=i*.04;
+      const p=easeOut(clamp(revealP-delay,0,1));
+      if(p===0)return;
+      const px=toX(m[1]),py=toY(m[2]);
+      const col=m[3]==='above'?C.teal2:m[4]?C.teal2:C.red2;
+      const isHov=hovModel&&hovModel[0]===m[0];
+      const r=isHov?9:6;
+      ctx.beginPath();ctx.arc(px,py,r*p,0,6.28);
+      ctx.fillStyle=famCol[m[3]]||(m[4]?C.teal2:C.red2);
+      ctx.globalAlpha=p*.85;ctx.fill();
+      if(isHov){
+        ctx.globalAlpha=1;ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
+        ctx.fillStyle='rgba(0,0,0,.85)';ctx.fillRect(px+12,py-18,m[0].length*6.5+8,22);
+        ctx.fillStyle=C.text;ctx.font='11px sans-serif';ctx.textAlign='left';
+        ctx.fillText(m[0],px+16,py-2);
+      }
+      ctx.globalAlpha=1;
     });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ PIPELINE CANVAS ═══════ */
+(()=>{
+  const wrap=document.getElementById('pipeline-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0,active=0,lastSwitch=0;
+  const stages=[
+    {name:'Base',refusal:.205,nvas:.477},
+    {name:'SFT',refusal:.093,nvas:.599},
+    {name:'DPO',refusal:.186,nvas:.670},
+    {name:'IT',refusal:.357,nvas:.667},
+  ];
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);
+    t+=.016;
+    if(t-lastSwitch>3){active=(active+1)%4;lastSwitch=t;}
+
+    const n=stages.length,padL=60,padR=24,padT=40,padB=50;
+    const plotW=w-padL-padR,plotH=h-padT-padB;
+    const bw=plotW/n*.4,gap=plotW/n;
+
+    /* grid */
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    [0,.25,.5,.75,1].forEach(v=>{
+      const y=padT+plotH*(1-v);
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText((v*100).toFixed(0)+'%',padL-4,y+3);
+    });
+
+    /* bars and connection lines */
+    stages.forEach((s,i)=>{
+      const cx=padL+i*gap+gap/2;
+      const isActive=i===active;
+      const pulse=isActive?(1+.08*Math.sin(t*4)):1;
+
+      /* refusal bar */
+      const rh=s.refusal*plotH;
+      const ry=padT+plotH-rh;
+      const rGrad=ctx.createLinearGradient(0,ry,0,padT+plotH);
+      rGrad.addColorStop(0,hexAlpha('#e74c3c',isActive?.9:.5));
+      rGrad.addColorStop(1,hexAlpha('#b22222',isActive?.6:.3));
+      ctx.fillStyle=rGrad;
+      ctx.beginPath();ctx.roundRect(cx-bw-4,ry,bw,rh,3);ctx.fill();
+
+      /* nvas bar */
+      const nh=s.nvas*plotH;
+      const ny=padT+plotH-nh;
+      const nGrad=ctx.createLinearGradient(0,ny,0,padT+plotH);
+      nGrad.addColorStop(0,hexAlpha('#27AE60',isActive?.9:.5));
+      nGrad.addColorStop(1,hexAlpha('#1A8A6C',isActive?.6:.3));
+      ctx.fillStyle=nGrad;
+      ctx.beginPath();ctx.roundRect(cx+4,ny,bw,nh,3);ctx.fill();
+
+      /* stage label */
+      ctx.fillStyle=isActive?C.gold2:'rgba(122,138,170,.7)';
+      ctx.font=`${isActive?'bold ':''} ${Math.max(10,w*.012)}px monospace`;
+      ctx.textAlign='center';
+      ctx.fillText(s.name,cx,h-padB+16);
+
+      /* value labels */
+      if(isActive){
+        ctx.fillStyle=C.red2;ctx.font='bold 10px sans-serif';
+        ctx.fillText((s.refusal*100).toFixed(1)+'%',cx-bw/2-4,ry-4);
+        ctx.fillStyle=C.teal2;
+        ctx.fillText(s.nvas.toFixed(3),cx+bw/2+4,ny-4);
+      }
+    });
+
+    /* DPO arrow annotation */
+    const dpoX=padL+2*gap+gap/2;
+    ctx.strokeStyle='rgba(200,150,12,.6)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(dpoX,padT+20);ctx.lineTo(dpoX,padT+70);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C.gold2;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('← Gate added',dpoX,padT+14);
+    ctx.fillStyle='rgba(200,150,12,.7)';ctx.font='9px sans-serif';
+    ctx.fillText('Refusal ↑, NVAS still ↑',dpoX,padT+28);
+
+    /* axis title */
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('OLMo-32B Training Pipeline',w/2,padT-12);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ TAXONOMY SCATTER ═══════ */
+(()=>{
+  const wrap=document.getElementById('taxonomy-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},revP=0,hov=null,t=0;
+
+  /* T3 questions: [topic, refusal, nvas, label] */
+  const qs=[
+    ['LGBTQ+',0.55,0.62,'Same-sex couples adopt'],
+    ['LGBTQ+',0.48,0.58,'Homosexuality justifiable'],
+    ['LGBTQ+',0.52,0.61,'Same-sex marriage OK'],
+    ['LGBTQ+',0.42,0.65,'Gay rights important'],
+    ['LGBTQ+',0.38,0.63,'LGBT social acceptance'],
+    ['LGBTQ+',0.44,0.60,'Same-sex partner benefits'],
+    ['Gender',0.18,0.55,'Men better political leaders'],
+    ['Gender',0.25,0.52,'Wife-beating justified'],
+    ['Gender',0.22,0.57,'Women need children'],
+    ['Gender',0.20,0.54,'Sons & daughters equal univ.'],
+    ['Gender',0.28,0.56,'Men priority for jobs'],
+    ['Gender',0.16,0.53,'Women obey husbands'],
+    ['Violence',0.35,0.67,'Violence for political goals'],
+    ['Religious',0.30,0.69,'Trust in religious leaders'],
+    ['Political',0.32,0.64,'Army rule acceptable'],
+    ['Social dist.',0.26,0.71,'Neighbor of diff. religion'],
+    ['Social dist.',0.34,0.68,'Neighbor of diff. ethnicity'],
+    ['Rights',0.19,0.72,'Individual vs state'],
+    ['LGBTQ+',0.46,0.59,'Homosexuality wrong'],
+    ['Gender',0.23,0.56,'Housewife fulfilling'],
+    ['Violence',0.31,0.66,'Honour killing justified'],
+    ['Social dist.',0.28,0.70,'Marry outside religion'],
+    ['Religious',0.33,0.65,'Religious law over state law'],
+    ['Political',0.29,0.73,'Strong leader no parliament'],
+    ['Rights',0.21,0.74,'Freedom of expression'],
+    ['LGBTQ+',0.50,0.61,'Pride events ban'],
+    ['Gender',0.17,0.58,'Men breadwinner'],
+    ['Violence',0.36,0.63,'Child punishment OK'],
+    ['Political',0.24,0.72,'Democracy preferred'],
+  ];
+  const topicCol={'LGBTQ+':C.red2,'Gender':C.blue2,'Violence':'#e67e22','Religious':'#9b59b6','Political':C.teal2,'Social dist.':C.gold2,'Rights':'#16a085'};
+
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revP=.001;obs.disconnect();}},{threshold:.2});
+  obs.observe(wrap);
+
+  wrap.parentElement.addEventListener('mousemove',e=>{
+    const rect=wrap.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const{w,h}=dim,pad=55,xRange=[.1,.85],yRange=[.1,.85];
+    const toX=v=>pad+(v-xRange[0])/(xRange[1]-xRange[0])*(w-pad*2);
+    const toY=v=>h-pad-(v-yRange[0])/(yRange[1]-yRange[0])*(h-pad*2);
+    hov=null;
+    qs.forEach(q=>{const px=toX(q[2]),py=toY(q[1]);if(Math.hypot(mx-px,my-py)<12)hov=q;});
+  });
+
+  function frame(){
+    const{w,h}=dim;
+    ctx.clearRect(0,0,w,h);t+=.016;
+    if(revP>0&&revP<1)revP=Math.min(1,revP+.018);
+
+    const pad=55,xRange=[.1,.85],yRange=[.1,.85];
+    const toX=v=>pad+(v-xRange[0])/(xRange[1]-xRange[0])*(w-pad*2);
+    const toY=v=>h-pad-(v-yRange[0])/(yRange[1]-yRange[0])*(h-pad*2);
+    const plotW=w-pad*2,plotH=h-pad*2;
+
+    /* quadrant fill */
+    const qx=toX(.60),qy=toY(.30);
+    ctx.fillStyle='rgba(178,34,34,.06)';ctx.fillRect(qx,pad,w-pad-qx,qy-pad);
+    ctx.fillStyle='rgba(26,138,108,.06)';ctx.fillRect(pad,qy,qx-pad,h-pad-qy);
+
+    /* quadrant labels */
+    ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(178,34,34,.55)';ctx.fillText('SUPPRESSION',qx+(w-pad-qx)/2,pad+18);ctx.fillText('FAILURES',qx+(w-pad-qx)/2,pad+32);
+    ctx.fillStyle='rgba(39,174,96,.45)';ctx.fillText('REPRESENTATIONAL',pad+(qx-pad)/2,qy+h*.1);ctx.fillText('BIAS',pad+(qx-pad)/2,qy+h*.1+14);
+
+    /* quadrant lines */
+    ctx.strokeStyle='rgba(200,150,12,.3)';ctx.lineWidth=1;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(qx,pad);ctx.lineTo(qx,h-pad);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(pad,qy);ctx.lineTo(w-pad,qy);ctx.stroke();
+    ctx.setLineDash([]);
+
+    /* axis ticks/labels */
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='9px monospace';
+    [.1,.3,.5,.7].forEach(v=>{
+      const xp=toX(v),yp=toY(v);
+      ctx.textAlign='center';ctx.fillText(v.toFixed(1),xp,h-pad+13);
+      ctx.textAlign='right';ctx.fillText((v*100).toFixed(0)+'%',pad-4,yp+3);
+    });
+    ctx.textAlign='center';ctx.font='11px sans-serif';ctx.fillStyle='rgba(122,138,170,.8)';
+    ctx.fillText('NVAS when answered',w/2,h-4);
+    ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('Refusal Rate',0,0);ctx.restore();
+
+    /* dots */
+    qs.forEach((q,i)=>{
+      const p=easeOut(clamp(revP-i*.025,0,1));
+      if(!p)return;
+      const px=toX(q[2]),py=toY(q[1]);
+      const col=topicCol[q[0]]||C.gold;
+      const isHov=hov&&hov[3]===q[3];
+      const r=isHov?10:7;
+      ctx.beginPath();ctx.arc(px,py,r*p,0,6.28);
+      ctx.fillStyle=col;ctx.globalAlpha=p*.82;ctx.fill();
+      if(isHov){
+        ctx.globalAlpha=1;ctx.strokeStyle='white';ctx.lineWidth=1.5;ctx.stroke();
+        const tw=q[3].length*6.5+10;
+        ctx.fillStyle='rgba(7,9,26,.92)';ctx.fillRect(px+13,py-20,tw,22);
+        ctx.fillStyle=col;ctx.font='bold 10px sans-serif';ctx.textAlign='left';
+        ctx.fillText(q[0]+': '+q[3],px+17,py-4);
+      }
+      ctx.globalAlpha=1;
+    });
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ SAFETY TAX BARS ═══════ */
+(()=>{
+  const data=[
+    {lbl:'ALLAM-7B-IT',v:37.6,c:'#c0392b'},{lbl:'OLMo-32B-IT',v:25.3,c:'#e74c3c'},
+    {lbl:'AYA-Expanse-32B',v:20.1,c:'#e67e22'},{lbl:'Tulu-3.1-8B',v:18.2,c:'#f39c12'},
+    {lbl:'LLaMA-3.1-8B-IT',v:14.2,c:'#f1c40f'},{lbl:'Gemma-3-27B-IT',v:13.0,c:'#d4ac0d'},
+    {lbl:'AYA-Expanse-8B',v:11.8,c:'#27ae60'},{lbl:'Mean (instruct)',v:11.5,c:C.gold2},
+    {lbl:'Gemma-3-12B-IT',v:10.4,c:'#1abc9c'},{lbl:'Jais-2-8B',v:9.6,c:'#16a085'},
+    {lbl:'Qwen3-30B-MoE',v:8.8,c:'#1a8a6c'},{lbl:'Qwen2.5-7B-IT',v:8.1,c:'#1a8a6c'},
+    {lbl:'GPT-4o-mini',v:6.1,c:'#5B9BD5'},{lbl:'FANAR-1.9B',v:5.2,c:'#3498db'},
+    {lbl:'Gemma-3-4B-IT',v:4.8,c:'#2980b9'},{lbl:'GPT-5',v:-2.9,c:'#3498db'},
+  ];
+  const chart=document.getElementById('tax-chart');
+  if(!chart)return;
+  const max=40;
+  data.forEach(d=>{
+    const row=document.createElement('div');row.className='bar-row';
+    const pct=Math.max(d.v,0)/max*100;
+    const neg=d.v<0;
+    row.innerHTML=`<div class="bar-lbl">${d.lbl}</div>
+      <div class="bar-track"><div class="bar-fill" style="background:${d.c}" data-w="${pct}%"></div></div>
+      <div class="bar-val" style="color:${d.c}">${d.v>0?'+':''}${d.v}%</div>`;
+    chart.appendChild(row);
+    if(neg){row.querySelector('.bar-val').style.color='#3498db';}
+  });
+  const obs=new IntersectionObserver(e=>{
+    if(!e[0].isIntersecting)return;
+    chart.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w);
+    obs.disconnect();
+  },{threshold:.2});
+  obs.observe(chart);
+})();
+
+/* ═══════ SCALE CANVAS (7B vs 32B) ═══════ */
+(()=>{
+  const wrap=document.querySelector('#tax .cvs-box:last-of-type');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const stages=['Base','SFT','DPO','IT'];
+  const s7=[.028,.052,.072,.098],s32=[.041,.068,.142,.253];
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    const padL=55,padR=20,padT=24,padB=36,plotW=w-padL-padR,plotH=h-padT-padB;
+    const n=stages.length;
+
+    /* grid */
+    [0,.1,.2,.3].forEach(v=>{
+      const y=padT+plotH*(1-v/.3);
+      ctx.strokeStyle='rgba(255,255,255,.07)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText((v*100).toFixed(0)+'%',padL-4,y+3);
+    });
+
+    /* draw lines */
+    [[s7,C.blue2,'7B'],[s32,C.red2,'32B']].forEach(([vals,col,lbl])=>{
+      ctx.strokeStyle=col;ctx.lineWidth=2;
+      ctx.beginPath();
+      vals.forEach((v,i)=>{
+        const x=padL+(i/(n-1))*plotW,y=padT+plotH*(1-v/.3);
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+        ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,5,0,6.28);ctx.fill();
+        ctx.beginPath();// re-begin for line
+      });
+      ctx.strokeStyle=col;ctx.lineWidth=2;
+      ctx.beginPath();vals.forEach((v,i)=>{const x=padL+(i/(n-1))*plotW,y=padT+plotH*(1-v/.3);i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);});
+      ctx.stroke();
+      /* label at end */
+      const lx=padL+plotW,ly=padT+plotH*(1-vals[n-1]/.3);
+      ctx.fillStyle=col;ctx.font='bold 10px sans-serif';ctx.textAlign='left';
+      ctx.fillText(lbl+' '+((vals[n-1])*100).toFixed(1)+'%',lx+4,ly+4);
+    });
+
+    /* x labels */
+    stages.forEach((s,i)=>{
+      ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px monospace';ctx.textAlign='center';
+      ctx.fillText(s,padL+(i/(n-1))*plotW,h-4);
+    });
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Safety tax by training stage (OLMo-3)',w/2,padT-6);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ COUNTRY GRID ═══════ */
+(()=>{
+  const grid=document.getElementById('country-grid');
+  if(!grid)return;
+  const data=[
+    {n:'Palestine',s:.731,r:.352},{n:'Turkey',s:.718,r:.195},
+    {n:'Iran',s:.712,r:.288},{n:'Tunisia',s:.709,r:.241},
+    {n:'Jordan',s:.707,r:.313},{n:'Morocco',s:.703,r:.261},
+    {n:'Egypt',s:.698,r:.225},{n:'Kuwait',s:.695,r:.279},
+    {n:'Iraq',s:.692,r:.304},{n:'Lebanon',s:.688,r:.271},
+    {n:'Libya',s:.674,r:.248},{n:'Sudan',s:.651,r:.292},
+    {n:'Qatar',s:.641,r:.335},{n:'Saudi Arabia',s:.629,r:.319},
+    {n:'Mauritania',s:.587,r:.268},{n:'Algeria',s:.532,r:.242},
+  ];
+  function col(v){
+    const t=(v-.52)/(.74-.52);
+    return `rgb(${Math.round(192+(26-192)*t)},${Math.round(57+(138-57)*t)},${Math.round(43+(108-43)*t)})`;
+  }
+  data.forEach((d,i)=>{
+    const cc=document.createElement('div');cc.className='cc';
+    const c=col(d.s);
+    cc.style.background=`rgba(${d.s>.66?'26,138,108':'178,34,34'},.07)`;
+    cc.style.borderColor=c+'55';
+    const flag=i===0?'<span class="tag tag-t" style="font-size:.6rem">Best</span>':i===15?'<span class="tag tag-r" style="font-size:.6rem">Worst</span>':'';
+    cc.innerHTML=`<div class="cc-name">${d.n} ${flag}</div><div class="cc-score" style="color:${c}">${d.s.toFixed(3)}</div><div class="cc-bar" style="background:${c};width:${((d.s-.5)/(.24)*100).toFixed(0)}%"></div><div class="cc-refusal">refusal: ${(d.r*100).toFixed(1)}%</div>`;
+    grid.appendChild(cc);
+  });
+})();
+
+/* ═══════ FRAMING CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#framing .cvs-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const framings=[
+    {n:'No-Mention EN',ref:.223,nvas:null},{n:'Persona EN',ref:.243,nvas:.684},
+    {n:'Persona Native',ref:.162,nvas:.665},{n:'Third EN ✦',ref:.176,nvas:.694},
+    {n:'Third Native',ref:.164,nvas:.661},
+  ];
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    const padL=80,padR=30,padT=30,padB=50;
+    const n=framings.length,plotW=w-padL-padR,plotH=h-padT-padB;
+    const bw=plotW/n*.3;
+
+    /* grid */
+    [0,.25,.5,.75,1].forEach(v=>{
+      const y=padT+plotH*(1-v);
+      ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+    });
+
+    framings.forEach((f,i)=>{
+      const cx=padL+(i+.5)*plotW/n;
+      const isBest=i===3;
+
+      /* refusal bar */
+      const rh=f.ref/0.30*plotH*.8;
+      const ry=padT+plotH-rh;
+      ctx.fillStyle=isBest?hexAlpha('#e74c3c',.9):hexAlpha('#e74c3c',.45);
+      ctx.beginPath();ctx.roundRect(cx-bw-3,ry,bw,rh,3);ctx.fill();
+      ctx.fillStyle=isBest?C.red2:'rgba(231,76,60,.5)';ctx.font=`${isBest?'bold ':''} 10px sans-serif`;ctx.textAlign='center';
+      ctx.fillText((f.ref*100).toFixed(1)+'%',cx-bw/2-3,ry-4);
+
+      /* nvas bar */
+      if(f.nvas){
+        const nh=(f.nvas-.64)/(.07)*plotH*.5;
+        const ny=padT+plotH-nh;
+        ctx.fillStyle=isBest?hexAlpha('#27AE60',.9):hexAlpha('#27AE60',.45);
+        ctx.beginPath();ctx.roundRect(cx+3,ny,bw,nh,3);ctx.fill();
+        ctx.fillStyle=isBest?C.teal2:'rgba(39,174,96,.5)';ctx.font=`${isBest?'bold ':''} 10px sans-serif`;
+        ctx.fillText(f.nvas.toFixed(3),cx+bw/2+3,ny-4);
+      }
+
+      /* label */
+      ctx.fillStyle=isBest?C.gold2:'rgba(122,138,170,.7)';
+      ctx.font=`${isBest?'bold ':''} ${Math.max(8,w*.01)}px sans-serif`;ctx.textAlign='center';
+      const words=f.n.split(' ');
+      words.forEach((wd,wi)=>ctx.fillText(wd,cx,h-padB+14+wi*12));
+    });
+
+    /* "2.6× benefit" callout */
+    const bx=padL+3.5*plotW/n;
+    ctx.strokeStyle='rgba(200,150,12,.7)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    ctx.beginPath();ctx.moveTo(padL+1.5*plotW/n,padT+plotH*.35);ctx.lineTo(bx,padT+plotH*.35);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C.gold2;ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('2.6× NVAS benefit on T3',bx-(plotW/n),padT+plotH*.32);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ FRAMING PER-MODEL CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#framing .cvs-box:last-of-type');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  /* [model, gain_from_third_framing, has_gate] */
+  const mods=[
+    ['GPT-4o-mini',.155,true],['GPT-5',.137,true],['ALLAM-7B',.098,true],
+    ['Gemma-27B',.091,true],['OLMo-32B-IT',.085,true],['AYA-32B',.078,true],
+    ['Tulu-3.1',.072,true],['LLaMA-8B-IT',.065,true],['Gemma-12B',.058,true],
+    ['Qwen3-30B',.051,true],['OLMo-7B-IT',.044,true],['Qwen2.5-7B',.038,true],
+    ['AYA-8B',.031,true],['Gemma-4B',.024,true],['Jais-2-8B',.018,true],
+    ['Tulu-SFT',.006,false],['OLMo-32B-SFT',.003,false],['LLaMA-Base',.001,false],
+  ];
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    const padL=16,padR=100,padT=24,padB=36,plotW=w-padL-padR,plotH=h-padT-padB;
+    const max=.16,n=mods.length;
+
+    /* grid */
+    ctx.strokeStyle='rgba(255,255,255,.05)';ctx.lineWidth=1;
+    [0,.05,.1,.15].forEach(v=>{
+      const x=padL+v/max*plotW;
+      ctx.beginPath();ctx.moveTo(x,padT);ctx.lineTo(x,h-padB);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='center';
+      ctx.fillText((v*100).toFixed(0)+'%',x,h-padB+12);
+    });
+
+    mods.forEach((m,i)=>{
+      const bh=plotH/n*.7;
+      const by=padT+i*plotH/n+(plotH/n-bh)/2;
+      const bw_fill=m[1]/max*plotW;
+      ctx.fillStyle=m[2]?hexAlpha(C.teal2,.75):hexAlpha(C.muted+'.4)',1);
+      ctx.beginPath();ctx.roundRect(padL,by,bw_fill,bh,3);ctx.fill();
+      ctx.fillStyle=m[2]?'rgba(122,138,170,.85)':'rgba(122,138,170,.4)';
+      ctx.font=`${Math.max(8,h*.036)}px sans-serif`;ctx.textAlign='left';
+      ctx.fillText(m[0],padL+bw_fill+6,by+bh*.7);
+      if(m[1]>=.01){
+        ctx.fillStyle=m[2]?C.teal2:'rgba(122,138,170,.5)';ctx.textAlign='right';
+        ctx.fillText('+'+( m[1]*100).toFixed(1)+'%',padL+bw_fill-4,by+bh*.72);
+      }
+    });
+
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('T3 NVAS gain from Third-person framing (vs Persona-EN)',w/2,padT-6);
+    ctx.fillStyle=C.teal2;ctx.font='9px sans-serif';ctx.textAlign='left';
+    ctx.fillText('Has suppression gate →',padL+.06/max*plotW,h-padB+24);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ PCA COLLAPSE CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#language .cvs-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const arabicC=['Algeria','Egypt','Iraq','Jordan','Kuwait','Lebanon','Libya','Mauritania','Morocco','Palestine','Qatar','Saudi Arabia','Sudan','Tunisia'];
+  const seeds=arabicC.map((_,i)=>[Math.random()*.3+.15,Math.random()*.3+.15]);// fixed layout
+  const engPos=[[.38,.28],[.62,.22],[.71,.48],[.45,.65],[.22,.55],[.58,.72],[.30,.38],[.68,.32],[.52,.18],[.78,.62],[.25,.72],[.65,.55],[.42,.82],[.18,.42]];
+  const collapse={x:.38,y:.48};
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.004;
+
+    /* Oscillate EN ↔ Arabic every 4s */
+    const phase=(Math.sin(t)+1)/2;
+    const prog=easeInOut(phase);
+
+    /* BG label */
+    ctx.font='11px monospace';ctx.fillStyle='rgba(122,138,170,.55)';ctx.textAlign='center';
+    ctx.fillText(prog<0.5?'English prompting →':'← Arabic prompting',w*.5,h*.06);
+
+    /* Scatter range for Arabic collapse */
+    const spread=1-prog*.88;
+
+    /* Draw Arabic countries */
+    arabicC.forEach((name,i)=>{
+      const ex=engPos[i][0],ey=engPos[i][1];
+      const ax=collapse.x+(engPos[i][0]-collapse.x)*.15*spread;
+      const ay=collapse.y+(engPos[i][1]-collapse.y)*.15*spread;
+      const px=lerp(ex,ax,prog)*w, py=lerp(ey,ay,prog)*h;
+      ctx.beginPath();ctx.arc(px,py,5,0,6.28);
+      ctx.fillStyle=hexAlpha(C.red2,.75+prog*.1);ctx.fill();
+      if(prog<.5||i<3){
+        ctx.fillStyle=hexAlpha(C.red2,(.8*(1-prog*.8)));ctx.font='9px sans-serif';ctx.textAlign='center';
+        ctx.fillText(name.slice(0,4),px,py-8);
+      }
+    });
+
+    /* Collapse circle overlay */
+    if(prog>.55){
+      const a=(prog-.55)/.45,cr=collapse.x*w,cy2=collapse.y*h;
+      ctx.beginPath();ctx.arc(cr,cy2,28*a+16,0,6.28);
+      ctx.strokeStyle=hexAlpha(C.red2,a*.55);ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle=hexAlpha(C.red2,a);ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      ctx.fillText('66.5% identical',cr,cy2+48*a+12);
+      ctx.fillText('responses',cr,cy2+48*a+26);
+    }
+
+    /* Iran & Turkey – always separate */
+    [[.12,.30,C.blue2,'Iran'],[.85,.22,C.teal2,'Turkey']].forEach(([x,y,col,name])=>{
+      ctx.beginPath();ctx.arc(x*w,y*h,5,0,6.28);ctx.fillStyle=col;ctx.fill();
+      ctx.fillStyle=col;ctx.font='9px sans-serif';ctx.textAlign='center';ctx.fillText(name,x*w,y*h-9);
+    });
+
+    /* pairwise corr annotation */
+    ctx.fillStyle='rgba(122,138,170,.65)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText(`Pairwise corr: ${(lerp(.814,.884,prog)).toFixed(3)}`,w*.5,h*.93);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ LANGUAGE HEATMAP ═══════ */
+(()=>{
+  const cells=[
+    {id:'hm00',v:-.016},{id:'hm01',v:-.036},{id:'hm02',v:-.054},
+    {id:'hm10',v:-.033},{id:'hm11',v:-.092},{id:'hm12',v:-.076},
+  ];
+  const obs=new IntersectionObserver(e=>{
+    if(!e[0].isIntersecting)return;
+    cells.forEach((cell,i)=>{
+      const el=document.getElementById(cell.id);
+      if(!el)return;
+      setTimeout(()=>{
+        const t=Math.abs(cell.v)/.1;
+        const r=Math.round(178*t+26*(1-t));
+        const g=Math.round(34*t+138*(1-t));
+        const b=Math.round(34*t+108*(1-t));
+        el.style.background=`rgba(${r},${g},${b},.35)`;
+        el.style.borderColor=`rgba(${r},${g},${b},.5)`;
+        el.style.border='1px solid';
+        el.textContent=cell.v.toFixed(3);
+        el.style.color=`rgb(${r+60},${g+60},${b+60})`;
+        el.style.fontWeight='700';
+      },i*120);
+    });
+    obs.disconnect();
+  },{threshold:.3});
+  const hm=document.getElementById('lang-hm');
+  if(hm)obs.observe(hm);
+})();
+
+/* ═══════ SAE METERS ═══════ */
+(()=>{
+  const obs=new IntersectionObserver(e=>{
+    if(!e[0].isIntersecting)return;
+    /* T3 counter */
+    let s=null;
+    function stepT3(ts){
+      if(!s)s=ts;const p=easeOut(clamp((ts-s)/1400,0,1));
+      const v=28.6*p;
+      document.getElementById('mp-t3').textContent=v.toFixed(1)+'%';
+      document.getElementById('mf-t3').style.height=(v/100*100)+'%';
+      if(p<1)requestAnimationFrame(stepT3);
+    }
+    requestAnimationFrame(stepT3);
+    document.getElementById('mf-t1').style.height='.5%';
+    document.getElementById('mf-t2').style.height='.4%';
+    document.getElementById('mp-t1').textContent='0%';
+    obs.disconnect();
+  },{threshold:.3});
+  const mg=document.getElementById('sae-meters');
+  if(mg)obs.observe(mg);
+})();
+
+/* ═══════ SAE ABLATION CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#mechanism .cvs-box');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0,ablated=false;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  /* 20 seed data: T3 shift, T1 shift */
+  const seeds20=[.25,-.03,.31,.08,.28,.02,-.06,.19,.14,-.11,.33,.07,.22,-.04,.18,.11,.28,.05,-.08,.24];
+  const t1seeds=Array(20).fill(0);
+
+  let showAblated=false;
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){showAblated=true;obs.disconnect();}},{threshold:.4});
+  obs.observe(wrap);
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    const n=20,padL=50,padR=20,padT=30,padB=40,plotW=w-padL-padR,plotH=h-padT-padB;
+    const maxY=.5,minY=-.2;
+
+    /* grid */
+    [-.2,0,.1,.2,.3,.4,.5].forEach(v=>{
+      const y=padT+plotH*(1-(v-minY)/(maxY-minY));
+      ctx.strokeStyle=v===0?'rgba(255,255,255,.2)':'rgba(255,255,255,.05)';ctx.lineWidth=v===0?1.5:1;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.55)';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText(v.toFixed(1),padL-4,y+3);
+    });
+
+    /* zero baseline label */
+    const zy=padT+plotH*(1-(0-minY)/(maxY-minY));
+    ctx.fillStyle='rgba(255,255,255,.3)';ctx.font='9px sans-serif';ctx.textAlign='left';
+    ctx.fillText('No effect',padL+4,zy-4);
+
+    /* draw seeds */
+    seeds20.forEach((v,i)=>{
+      const x=padL+(i+.5)*plotW/n;
+      const delay=showAblated?i*.04:999;
+      const p=easeOut(clamp(t*1.2-delay,0,1));
+      const y=padT+plotH*(1-(v*p-minY)/(maxY-minY));
+      const zy2=padT+plotH*(1-(0-minY)/(maxY-minY));
+      const col=v>0?C.red2:C.blue2;
+      ctx.fillStyle=col;
+      ctx.beginPath();ctx.roundRect(x-4,Math.min(y,zy2),8,Math.abs(y-zy2),2);ctx.fill();
+      /* T1 dot */
+      ctx.beginPath();ctx.arc(x,zy2,3,0,6.28);ctx.fillStyle=C.teal2;ctx.fill();
+    });
+
+    /* mean line */
+    const meanY=padT+plotH*(1-(.250-minY)/(maxY-minY));
+    ctx.strokeStyle=hexAlpha(C.red2,.7);ctx.lineWidth=1.5;ctx.setLineDash([6,3]);
+    ctx.beginPath();ctx.moveTo(padL,meanY);ctx.lineTo(w-padR,meanY);ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=C.red2;ctx.font='bold 10px sans-serif';ctx.textAlign='left';
+    ctx.fillText('mean ΔT3 = +0.250 (p=0.016)',padL+4,meanY-5);
+
+    /* annotation */
+    ctx.fillStyle=C.teal2;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('ΔT1 = 0.000 in ALL 40 seeds',w*.6,h-padB+28);
+
+    /* axis labels */
+    ctx.fillStyle='rgba(122,138,170,.6)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('SAE seed (20 Tulu-3-8B runs)',w/2,h-4);
+    ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('Logit shift after ablation',0,0);ctx.restore();
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ LOGIT LENS CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#mechanism .cvs-box:nth-of-type(2)');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0,drawP=0,revealed=false;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revealed=true;obs.disconnect();}},{threshold:.3});
+  obs.observe(wrap);
+
+  const L=32;
+  function gapIT(i){
+    if(i<5)return .005*i;
+    if(i<12)return -.01*(i-5);
+    return -.349*((i-12)/19);
+  }
+  function gapDPO(i){
+    if(i<5)return .004*i;
+    if(i<12)return -.008*(i-5);
+    return -.672*((i-12)/19);
+  }
+  function gapBase(i){return .01*Math.sin(i*.3);}
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    if(revealed&&drawP<1)drawP=Math.min(1,drawP+.022);
+
+    const padL=55,padR=20,padT=30,padB=38,plotW=w-padL-padR,plotH=h-padT-padB;
+
+    /* grid */
+    [-.7,-.5,-.35,-.2,0,.1].forEach(v=>{
+      const y=padT+plotH*(1-(v+.7)/(.7+.15));
+      ctx.strokeStyle=v===0?'rgba(255,255,255,.18)':'rgba(255,255,255,.06)';ctx.lineWidth=v===0?1.5:1;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText(v.toFixed(2),padL-4,y+3);
+    });
+
+    /* draw curves */
+    const curves=[
+      {fn:gapBase,col:'rgba(255,255,255,.25)',lw:1.5,lbl:'Base (≈0)'},
+      {fn:gapIT,col:C.gold2,lw:2,lbl:'Tulu-IT (min −0.349)'},
+      {fn:gapDPO,col:C.red2,lw:2.5,lbl:'Tulu-DPO (min −0.672)'},
+    ];
+
+    curves.forEach(cv=>{
+      const steps=Math.floor(L*drawP);
+      if(steps<2)return;
+      ctx.beginPath();
+      for(let i=0;i<steps;i++){
+        const x=padL+(i/(L-1))*plotW;
+        const v=cv.fn(i);
+        const y=padT+plotH*(1-(v+.7)/(0.7+.15));
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=cv.col;ctx.lineWidth=cv.lw;ctx.stroke();
+    });
+
+    /* layer 17 marker */
+    if(drawP>0.55){
+      const x17=padL+(17/(L-1))*plotW;
+      ctx.strokeStyle='rgba(200,150,12,.5)';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+      ctx.beginPath();ctx.moveTo(x17,padT);ctx.lineTo(x17,h-padB);ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle=C.gold2;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+      ctx.fillText('Layer 17',x17,padT-6);
+      ctx.fillText('DPO peak',x17,padT+6);
+    }
+
+    /* axis */
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Layer',w/2,h-2);
+    ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('T3 − T2 logit gap',0,0);ctx.restore();
+    ctx.fillText('Logit Lens: T3−T2 digit gap by layer',w*.6,padT-10);
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ PROBING CANVAS ═══════ */
+(()=>{
+  const wrap=document.querySelector('#mechanism .cvs-box:nth-of-type(3)');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},t=0,drawP=0,revealed=false;
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revealed=true;obs.disconnect();}},{threshold:.3});
+  obs.observe(wrap);
+
+  const L=32;
+  function r2(i){
+    if(i<3)return .06+.08*(i/3);
+    if(i<7)return .14-.14*((i-3)/4);
+    if(i<20)return -.012+.008*Math.sin(i*.4);
+    return -.025-.075*((i-20)/12);
+  }
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    if(revealed&&drawP<1)drawP=Math.min(1,drawP+.022);
+
+    const padL=55,padR=20,padT=30,padB=38,plotW=w-padL-padR,plotH=h-padT-padB;
+    const minV=-.12,maxV=.18;
+
+    /* grid */
+    [-.1,-.05,0,.05,.1,.14].forEach(v=>{
+      const y=padT+plotH*(1-(v-minV)/(maxV-minV));
+      ctx.strokeStyle=v===0?'rgba(255,255,255,.18)':'rgba(255,255,255,.06)';ctx.lineWidth=v===0?1.5:1;
+      ctx.beginPath();ctx.moveTo(padL,y);ctx.lineTo(w-padR,y);ctx.stroke();
+      ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='right';
+      ctx.fillText(v.toFixed(2),padL-4,y+3);
+    });
+
+    /* region fills */
+    const zy=padT+plotH*(1-(0-minV)/(maxV-minV));
+    ctx.fillStyle='rgba(26,138,108,.06)';ctx.fillRect(padL,padT,plotW*(4/L),zy-padT);
+    ctx.fillStyle='rgba(178,34,34,.06)';ctx.fillRect(padL+plotW*(22/L),zy,plotW*(10/L),h-padB-zy);
+
+    /* curve */
+    const steps=Math.floor(L*drawP);
+    if(steps>=2){
+      /* color gradient from teal to red */
+      ctx.beginPath();
+      for(let i=0;i<steps;i++){
+        const x=padL+(i/(L-1))*plotW;
+        const y=padT+plotH*(1-(r2(i)-minV)/(maxV-minV));
+        i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      const grad=ctx.createLinearGradient(padL,0,w-padR,0);
+      grad.addColorStop(0,C.teal2);grad.addColorStop(.35,C.gold2);grad.addColorStop(1,C.red2);
+      ctx.strokeStyle=grad;ctx.lineWidth=2.5;ctx.stroke();
+
+      /* dots at key layers */
+      [[2,r2(2),C.teal2,'L2: cultural enters'],[30,r2(30),C.red2,'L30: alignment counteracts']].forEach(([i,v,col,lbl])=>{
+        const x=padL+(i/(L-1))*plotW,y=padT+plotH*(1-(v-minV)/(maxV-minV));
+        ctx.beginPath();ctx.arc(x,y,5,0,6.28);ctx.fillStyle=col;ctx.fill();
+        ctx.fillStyle=col;ctx.font='bold 9px sans-serif';ctx.textAlign=i<16?'left':'right';
+        ctx.fillText(lbl,x+(i<16?8:-8),v>0?y-8:y+14);
+      });
+    }
+
+    /* axis */
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Layer',w/2,h-2);
+    ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('Residualised R²',0,0);ctx.restore();
+
+    requestAnimationFrame(frame);
+  }
+  frame();
+})();
+
+/* ═══════ FRONTIER SCATTER ═══════ */
+(()=>{
+  const wrap=document.querySelector('#frontier .scatter-wrap');
+  if(!wrap)return;
+  const c=wrap.querySelector('canvas');
+  const ctx=c.getContext('2d');
+  let dim={w:0,h:0},revP=0,hov=null,t=0;
+
+  /* [name, T3_refusal, T3_NVAS_Third, family] */
+  const mods=[
+    ['GPT-5',.048,.756,'gpt'],['GPT-4o-mini',.195,.726,'gpt'],
+    ['ALLAM-7B',.412,.634,'arabic'],['AYA-32B',.321,.668,'arabic'],
+    ['AYA-8B',.298,.662,'arabic'],['FANAR-1.9B',.278,.658,'arabic'],
+    ['Jais-2-8B',.285,.654,'arabic'],['OLMo-7B-IT',.288,.682,'olmo'],
+    ['OLMo-32B-IT',.357,.680,'olmo'],['OLMo-7B-DPO',.148,.671,'olmo'],
+    ['OLMo-32B-DPO',.186,.672,'olmo'],['OLMo-7B-SFT',.072,.699,'olmo'],
+    ['OLMo-32B-SFT',.093,.708,'olmo'],['OLMo-7B-Base',.121,.624,'olmo'],
+    ['Tulu-3.1-8B',.221,.691,'tulu'],['Tulu-DPO',.186,.686,'tulu'],
+    ['Tulu-SFT',.065,.703,'tulu'],['LLaMA-8B-IT',.214,.694,'llama'],
+    ['LLaMA-8B-Base',.093,.631,'llama'],['Gemma-27B-IT',.096,.712,'gemma'],
+    ['Gemma-12B-IT',.082,.698,'gemma'],['Gemma-4B-IT',.062,.688,'gemma'],
+    ['Qwen3-30B',.078,.714,'qwen'],['Qwen3-4B',.089,.703,'qwen'],
+    ['Qwen2.5-7B',.095,.704,'qwen'],['Mistral-7B',.052,.668,'other'],
+  ];
+  const famCol={'gpt':'#ff6b6b','arabic':C.teal2,'olmo':C.blue2,'tulu':'#9b59b6','llama':'#e67e22','gemma':'#16a085','qwen':'#8e44ad','other':'#7a8aaa'};
+
+  function resize(){dim=resizeCanvas(c,wrap)}
+  resize();window.addEventListener('resize',resize);
+
+  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revP=.001;obs.disconnect();}},{threshold:.2});
+  obs.observe(wrap);
+
+  wrap.addEventListener('mousemove',e=>{
+    const rect=wrap.getBoundingClientRect(),mx=e.clientX-rect.left,my=e.clientY-rect.top;
+    const{w,h}=dim,pad=55;
+    const toX=v=>pad+(v)/(0.5)*(w-pad*2);
+    const toY=v=>h-pad-(v-.60)/(.16)*(h-pad*2);
+    hov=null;
+    mods.forEach(m=>{if(Math.hypot(mx-toX(m[1]),my-toY(m[2]))<12)hov=m;});
+  });
+
+  function frame(){
+    const{w,h}=dim;ctx.clearRect(0,0,w,h);t+=.016;
+    if(revP>0&&revP<1)revP=Math.min(1,revP+.02);
+    const pad=55;
+    const toX=v=>pad+v/(0.5)*(w-pad*2);
+    const toY=v=>h-pad-(v-.60)/(.16)*(h-pad*2);
+
+    /* grid */
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;
+    [0,.1,.2,.3,.4,.5].forEach(v=>{ctx.beginPath();ctx.moveTo(toX(v),pad);ctx.lineTo(toX(v),h-pad);ctx.stroke();ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='center';ctx.fillText((v*100).toFixed(0)+'%',toX(v),h-pad+13);});
+    [.60,.64,.68,.72,.76].forEach(v=>{ctx.beginPath();ctx.moveTo(pad,toY(v));ctx.lineTo(w-pad,toY(v));ctx.stroke();ctx.fillStyle='rgba(122,138,170,.5)';ctx.font='9px monospace';ctx.textAlign='right';ctx.fillText(v.toFixed(2),pad-4,toY(v)+3);});
+
+    /* negative correlation line r=-0.61 */
+    const lx0=toX(0),ly0=toY(.756+0*.61*.16/.5);
+    const lx1=toX(.45),ly1=toY(.756-.45*.61*.16/.5*.8);
+    ctx.strokeStyle='rgba(200,150,12,.25)';ctx.lineWidth=1;ctx.setLineDash([5,4]);
+    ctx.beginPath();ctx.moveTo(lx0,ly0);ctx.lineTo(lx1,ly1);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(200,150,12,.5)';ctx.font='9px sans-serif';ctx.textAlign='right';
+    ctx.fillText('r = −0.61',w-pad-4,pad+14);
+
+    /* top-right highlight */
+    ctx.fillStyle='rgba(255,107,107,.06)';ctx.fillRect(toX(.0),pad,toX(.15)-toX(.0),toY(.71)-pad);
+    ctx.fillStyle='rgba(255,107,107,.45)';ctx.font='9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('GPT-5 alone here',toX(.075),pad+18);
+
+    /* dots */
+    mods.forEach((m,i)=>{
+      const p=easeOut(clamp(revP-i*.035,0,1));if(!p)return;
+      const px=toX(m[1]),py=toY(m[2]);
+      const isGPT5=m[0]==='GPT-5',isHov=hov&&hov[0]===m[0];
+      const r=(isGPT5?10:isHov?9:6)*p;
+      ctx.beginPath();ctx.arc(px,py,r,0,6.28);
+      ctx.fillStyle=famCol[m[3]];ctx.globalAlpha=p*.85;ctx.fill();
+      if(isGPT5){ctx.strokeStyle=C.gold2;ctx.lineWidth=2;ctx.globalAlpha=1;ctx.stroke();}
+      ctx.globalAlpha=1;
+      if(isGPT5||isHov){
+        ctx.fillStyle=isGPT5?C.gold2:'white';ctx.font=`bold 10px sans-serif`;ctx.textAlign='left';
+        ctx.fillText(m[0],px+12,py+4);
+      }
+    });
+
+    /* axes labels */
+    ctx.fillStyle='rgba(122,138,170,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('T3 Refusal Rate',w/2,h-2);
+    ctx.save();ctx.translate(13,h/2);ctx.rotate(-Math.PI/2);ctx.fillText('T3 NVAS (Third-EN framing)',0,0);ctx.restore();
 
     requestAnimationFrame(frame);
   }
   frame();
 })();
 </script>
-</body>
-</html>

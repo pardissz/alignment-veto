@@ -5,7 +5,7 @@
 [![Website](https://img.shields.io/badge/🌐%20Website-GitHub%20Pages-teal)](https://pardissz.github.io/alignment-veto)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-> **Pardis Sadat Zahraei, Nizi Nazar, Ehsaneddin Asgari**
+> **Pardis Sadat Zahraei, Gokhan Tur, Dilek Hakkani-Tür, Ehsaneddin Asgari**
 
 ---
 
@@ -204,7 +204,7 @@ ds = load_dataset("PardisSzah/alignment-veto-responses")
 ```bibtex
 @article{zahraei2026alignmentveto,
   title     = {The Alignment Veto: How Safety Training Suppresses Cultural Knowledge in LLMs},
-  author    = {Zahraei, Pardis Sadat and Nazar, Nizi and Asgari, Ehsaneddin},
+  author    = {Zahraei, Pardis Sadat and Tur, Gokhan and Hakkani-T\"{u}r, Dilek and Asgari, Ehsaneddin},
   journal   = {arXiv preprint},
   year      = {2026}
 }

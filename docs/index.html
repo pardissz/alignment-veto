@@ -6,22 +6,22 @@
 <title>The Alignment Veto</title>
 <style>
 :root{
-  --bg:#07091a;--bg2:#0c1028;--bg3:#111840;
-  --gold:#C8960C;--gold2:#F0B730;--gold3:#fff3cc;
-  --red:#b22222;--red2:#e74c3c;--red3:#ff9999;
-  --teal:#1A8A6C;--teal2:#27AE60;--teal3:#a8e6cf;
-  --blue:#1a5a9a;--blue2:#5B9BD5;--blue3:#b8d9f5;
-  --purple:#6c3483;--purple2:#9b59b6;
-  --text:#e8ecf4;--muted:#7a8aaa;--border:rgba(200,150,12,.18);
+  --bg:#ffffff;--bg2:#f3f5fb;--bg3:#e7ecf8;
+  --gold:#a07600;--gold2:#b88a00;--gold3:#5c3f00;
+  --red:#b22222;--red2:#cc2200;--red3:#8b0000;
+  --teal:#1a7a5c;--teal2:#1a8044;--teal3:#0a5430;
+  --blue:#1a5a9a;--blue2:#1a5fa0;--blue3:#0d3f6e;
+  --purple:#6c3483;--purple2:#7d3c98;
+  --text:#0e1428;--muted:#485070;--border:rgba(0,0,0,.1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;line-height:1.7;overflow-x:hidden}
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.12}
 .z1{position:relative;z-index:1}
 
 /* NAV */
-nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(7,9,26,.88);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;gap:1.8rem;align-items:center;flex-wrap:wrap}
+nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,.1);padding:.6rem 2rem;display:flex;gap:1.8rem;align-items:center;flex-wrap:wrap;box-shadow:0 1px 8px rgba(0,0,0,.06)}
 .nav-logo{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;margin-right:.5rem}
 nav a{color:var(--muted);text-decoration:none;font-size:.75rem;letter-spacing:.06em;transition:color .2s;font-family:sans-serif}
 nav a:hover{color:var(--gold2)}
@@ -30,7 +30,7 @@ nav a:hover{color:var(--gold2)}
 section{position:relative;z-index:1;padding:5.5rem 2rem}
 .container{max-width:940px;margin:0 auto}
 .wide{max-width:1180px;margin:0 auto}
-.alt{background:rgba(12,16,40,.7)}
+.alt{background:#f0f3fb}
 
 /* HEADINGS */
 h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.13;font-weight:700;margin-bottom:1.2rem}
@@ -53,20 +53,20 @@ h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-top:2rem}
-.stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:1.1rem .8rem;text-align:center;transition:border-color .3s}
+.stat{background:#f4f7ff;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:1.1rem .8rem;text-align:center;transition:border-color .3s}
 .stat:hover{border-color:var(--gold)}
 .stat-n{font-size:1.9rem;font-weight:700;color:var(--gold2);display:block;font-family:sans-serif;line-height:1.1}
 .stat-l{font-size:.68rem;color:var(--muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.09em;margin-top:.2rem}
 
 /* CANVAS WRAPPERS */
-.cvs-box{border-radius:10px;overflow:hidden;background:var(--bg);position:relative}
+.cvs-box{border-radius:10px;overflow:hidden;background:#0e1228;position:relative;box-shadow:0 2px 12px rgba(0,0,0,.12)}
 .cvs-box canvas{display:block;width:100%;height:100%}
 
 /* CARDS */
-.card{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:10px;padding:1.4rem}
+.card{background:#f8faff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:1.4rem}
 .card.red-bd{border-color:rgba(178,34,34,.45)}
-.paper-fig{margin:2.2rem 0;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.02)}
-.paper-fig img{width:100%;height:auto;display:block;border-bottom:1px solid var(--border)}
+.paper-fig{margin:2.2rem 0;border:1px solid rgba(0,0,0,.08);border-radius:10px;overflow:hidden;background:#ffffff;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.paper-fig img{width:100%;height:auto;display:block;border-bottom:1px solid rgba(0,0,0,.07)}
 .paper-fig figcaption{padding:.75rem 1.2rem;font-size:.78rem;color:var(--muted);font-family:sans-serif;line-height:1.7}
 .paper-fig figcaption strong{color:var(--text)}
 .paper-fig .fig-lbl{display:inline-block;font-size:.68rem;font-family:monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
@@ -83,14 +83,14 @@ h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
 /* TABLES */
 table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:.85rem;margin:1.2rem 0}
 th{color:var(--gold);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border);font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-td{padding:.5rem .7rem;border-bottom:1px solid rgba(255,255,255,.04);color:var(--muted);vertical-align:middle}
-tr:hover td{background:rgba(255,255,255,.02)}
+td{padding:.5rem .7rem;border-bottom:1px solid rgba(0,0,0,.05);color:var(--muted);vertical-align:middle}
+tr:hover td{background:rgba(0,0,0,.02)}
 tr.hl td{color:var(--text);font-weight:600}
 
 /* BARS */
 .bar-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem}
 .bar-lbl{width:190px;font-size:.75rem;font-family:monospace;color:var(--muted);text-align:right;flex-shrink:0}
-.bar-track{flex:1;height:20px;background:rgba(255,255,255,.05);border-radius:3px;overflow:hidden}
+.bar-track{flex:1;height:20px;background:rgba(0,0,0,.07);border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
 .bar-val{width:52px;font-size:.72rem;font-family:monospace;flex-shrink:0}
 
@@ -104,12 +104,12 @@ tr.hl td{color:var(--text);font-weight:600}
 .stage-sub{font-size:.7rem;color:var(--muted);font-family:sans-serif;margin-top:.25rem}
 
 /* SCATTER */
-.scatter-wrap{position:relative;height:380px;margin:1.5rem 0}
+.scatter-wrap{position:relative;height:380px;margin:1.5rem 0;background:#0e1228;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.12)}
 .scatter-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* METERS (SAE) */
 .meter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:1.5rem 0}
-.meter{background:rgba(255,255,255,.03);border-radius:10px;padding:1.4rem;text-align:center;border:1px solid var(--border);overflow:hidden;position:relative}
+.meter{background:#f4f7ff;border-radius:10px;padding:1.4rem;text-align:center;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative}
 .meter-fill{position:absolute;bottom:0;left:0;right:0;transition:height 1.4s cubic-bezier(.4,0,.2,1);height:0}
 .meter-content{position:relative;z-index:1}
 .meter-pct{font-size:2.4rem;font-weight:700;font-family:sans-serif;display:block;line-height:1.1}
@@ -124,7 +124,7 @@ tr.hl td{color:var(--text);font-weight:600}
 
 /* STEPS */
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1.5rem 0}
-.step{background:rgba(255,255,255,.03);border-radius:8px;padding:1.2rem;border:1px solid var(--border)}
+.step{background:#f6f8ff;border-radius:8px;padding:1.2rem;border:1px solid rgba(0,0,0,.08)}
 .step-n{font-size:1.8rem;font-weight:700;color:var(--gold);opacity:.35;line-height:1;display:block;font-family:sans-serif}
 .step-t{font-size:.88rem;font-weight:700;margin:.2rem 0}
 .step-b{font-size:.78rem;color:var(--muted);font-family:sans-serif}
@@ -147,12 +147,12 @@ blockquote{border-left:3px solid var(--gold);padding:.9rem 1.4rem;margin:1.8rem 
 blockquote strong{color:var(--text)}
 
 /* CODE/PRE */
-pre{background:rgba(0,0,0,.45);border:1px solid var(--border);border-radius:8px;padding:1.4rem;font-size:.8rem;color:var(--muted);overflow-x:auto;font-family:monospace;line-height:1.6}
+pre{background:#f0f2f8;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:1.4rem;font-size:.8rem;color:var(--text);overflow-x:auto;font-family:monospace;line-height:1.6}
 code{font-family:monospace;font-size:.85em;color:var(--gold2);background:rgba(200,150,12,.08);padding:.1rem .3rem;border-radius:3px}
 
 /* TOOLTIP */
 [data-tip]{cursor:help;position:relative}
-[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(0,0,0,.92);color:var(--text);font-size:.72rem;white-space:nowrap;padding:.35rem .7rem;border-radius:4px;z-index:300;pointer-events:none;font-family:sans-serif;border:1px solid var(--border);font-style:normal}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 5px);left:50%;transform:translateX(-50%);background:rgba(14,20,40,.94);color:#e8ecf4;font-size:.72rem;white-space:nowrap;padding:.35rem .7rem;border-radius:4px;z-index:300;pointer-events:none;font-family:sans-serif;border:1px solid rgba(0,0,0,.2);font-style:normal}
 
 /* LEGEND DOT */
 .ldot{width:9px;height:9px;border-radius:50%;display:inline-block;flex-shrink:0}
@@ -160,7 +160,7 @@ code{font-family:monospace;font-size:.85em;color:var(--gold2);background:rgba(20
 .legend span{display:flex;align-items:center;gap:.35rem}
 
 /* FOOTER */
-footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:sans-serif;font-size:.78rem;color:var(--muted);position:relative;z-index:1}
+footer{background:var(--bg2);border-top:1px solid rgba(0,0,0,.08);padding:2rem;text-align:center;font-family:sans-serif;font-size:.78rem;color:var(--muted);position:relative;z-index:1}
 footer a{color:var(--gold);text-decoration:none}
 </style>
 </head>
@@ -336,8 +336,8 @@ footer a{color:var(--gold);text-decoration:none}
   <h2>The <span class="red-txt">Alignment Veto</span></h2>
   <p class="lead">At the moment of refusal, a model's <em>internal</em> logit distribution correlates with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers. The knowledge is not erased — it is gated.</p>
 
-  <!-- Main concept animation — two stacked panels, simultaneously visible -->
-  <div class="cvs-box fi" style="height:460px;margin-bottom:.8rem" id="concept-box">
+  <!-- Main concept animation — 9-phase narrative slideshow -->
+  <div class="cvs-box fi" style="height:500px;margin-bottom:.8rem" id="concept-box">
     <canvas id="concept-canvas"></canvas>
   </div>
   <div class="legend" style="margin-bottom:.4rem">
@@ -388,9 +388,18 @@ footer a{color:var(--gold);text-decoration:none}
     <div class="legend">
       <span><span class="ldot" style="background:var(--teal2)"></span>Above diagonal (knowledge suppressed)</span>
       <span><span class="ldot" style="background:var(--red2)"></span>Below diagonal (genuine bias)</span>
-      <span><span class="ldot" style="background:rgba(255,255,255,.3)"></span>Diagonal: EV-NVAS = NVAS</span>
+      <span><span class="ldot" style="background:rgba(128,128,128,.5)"></span>Diagonal: EV-NVAS = NVAS</span>
     </div>
   </div>
+
+  <!-- Paper Figure 3 -->
+  <figure class="paper-fig fi" style="margin-top:2rem">
+    <img src="figures/fig3_suppression.png" alt="Figure 3: Suppression cost — EV-NVAS vs NVAS scatter for 24 models" loading="lazy"/>
+    <figcaption>
+      <span class="fig-lbl">Paper · Figure 3</span><br/>
+      <strong>Suppression cost scatter: EV-NVAS vs NVAS for 24 models (paper version).</strong> Each dot is a model; x-axis = accepted T3 NVAS, y-axis = refused T3 EV-NVAS. 19 of 24 models fall <em>above</em> the diagonal — the internal distribution at the moment of refusal is <em>more</em> culturally aligned than the expressed answer. The suppression gap (EV-NVAS − NVAS) ranges from +0.001 to +0.083.
+    </figcaption>
+  </figure>
 </div>
 </section>
 
@@ -457,11 +466,11 @@ footer a{color:var(--gold);text-decoration:none}
     Hover dots for question topics · Quadrant lines: refusal=30%, NVAS=0.60
   </div>
 
-  <!-- Paper Figure 3 -->
+  <!-- Paper Figure 5 -->
   <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig3_taxonomy.png" alt="Figure 3: T3 failure taxonomy scatter — refusal rate vs NVAS" loading="lazy"/>
+    <img src="figures/fig3_taxonomy.png" alt="Figure 5: T3 failure taxonomy scatter — refusal rate vs NVAS" loading="lazy"/>
     <figcaption>
-      <span class="fig-lbl">Paper · Figure 3</span><br/>
+      <span class="fig-lbl">Paper · Figure 5</span><br/>
       <strong>Failure taxonomy by T3 question (paper version).</strong> Each point is a T3 question averaged across all 26 models. Top-right quadrant (high refusal + high NVAS): suppression failures — knowledge is accurate but gated. Bottom-left (low refusal + low NVAS): representational bias — model answers freely but is wrong. The two clusters require different interventions.
     </figcaption>
   </figure>
@@ -601,11 +610,11 @@ footer a{color:var(--gold);text-decoration:none}
     </div>
   </div>
 
-  <!-- Paper Figure 4 -->
+  <!-- Paper Figure 6 -->
   <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig4_language.png" alt="Figure 4: NVAS gain/loss from English to native language" loading="lazy"/>
+    <img src="figures/fig4_language.png" alt="Figure 6: NVAS gain/loss from English to native language" loading="lazy"/>
     <figcaption>
-      <span class="fig-lbl">Paper · Figure 4</span><br/>
+      <span class="fig-lbl">Paper · Figure 6</span><br/>
       <strong>NVAS change from English → native language (Persona and Observer framings).</strong> Every cell is negative — switching to Arabic, Persian, or Turkish <em>hurts</em> cultural alignment for every model family tested, including Arabic-specialised ones. The Persian/Turkish drop is largest (Observer-Persian: −0.092), consistent with those languages being underrepresented in alignment training.
     </figcaption>
   </figure>
@@ -724,6 +733,15 @@ footer a{color:var(--gold);text-decoration:none}
     <span><span class="ldot" style="background:#ff6b6b"></span>GPT-5 ★</span>
     <span><span class="ldot" style="background:var(--purple2)"></span>Gemma / Qwen / Other</span>
   </div>
+
+  <!-- Paper Figure 4 -->
+  <figure class="paper-fig fi" style="margin-top:2rem">
+    <img src="figures/fig4_gating.png" alt="Figure 4: Safety tax vs NVAS scatter for flagship models" loading="lazy"/>
+    <figcaption>
+      <span class="fig-lbl">Paper · Figure 4</span><br/>
+      <strong>Safety tax vs NVAS across all 26 models (paper version).</strong> The negative correlation (r=−0.61, p&lt;0.01) shows that models currently trade cultural accuracy for refusal suppression. GPT-5 alone occupies the top-right frontier: highest NVAS (0.756) with negative safety tax (−2.9%). Arabic-specialised models cluster bottom-left: high safety tax with lower NVAS.
+    </figcaption>
+  </figure>
 </div>
 </section>
 
@@ -839,132 +857,295 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   if(sg)statsObs.observe(sg);
 })();
 
-/* ═══════ CONCEPT ANIMATION — Dual Stacked Panel ═══════ */
+/* ═══════ CONCEPT ANIMATION — 9-Phase Narrative ═══════ */
 (()=>{
   const wrap=document.getElementById('concept-box');
   if(!wrap)return;
   const c=wrap.querySelector('canvas');
   const ctx=c.getContext('2d');
-  let dim={w:0,h:0},t=0,revealed=false,buildP=0;
+  let dim={w:0,h:0},t=0,revealed=false;
   function resize(){dim=resizeCanvas(c,wrap)}
   resize();window.addEventListener('resize',resize);
   const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!revealed){revealed=true;obs.disconnect();}},{threshold:.1});
   obs.observe(wrap);
 
+  const DUR=[9,11,9,8,7,11,9,11,14]; // seconds per phase (89s total loop)
+  const TOTAL=DUR.reduce((a,b)=>a+b,0);
   function eO(x){return 1-(1-x)**3;}
 
-  // drawBars: data=[{v,col}], xlbls=['label',...], bx/by=top-left corner of bar area
-  function drawBars(data,xlbls,bx,by,bw,bh,ap,title,tcol){
-    const n=data.length,sw=bw/n,bW=sw*.58;
-    if(title){ctx.fillStyle=tcol;ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(title,bx+bw/2,by-6);}
-    ctx.strokeStyle='rgba(122,138,170,.15)';ctx.lineWidth=1;
+  function bars(data,xlbls,bx,by,bw,bh,ap,title,tcol,lfs){
+    const n=data.length,sw=bw/n,bW=sw*.62;
+    if(title){ctx.fillStyle=tcol;ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';ctx.fillText(title,bx+bw/2,by-7);}
+    ctx.strokeStyle='rgba(180,185,220,.2)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,by+bh);ctx.lineTo(bx+bw,by+bh);ctx.stroke();
     data.forEach((d,i)=>{
-      const x=bx+i*sw+(sw-bW)/2;
-      const bH=Math.max(1,d.v*bh*ap);
-      ctx.fillStyle=d.col;ctx.beginPath();ctx.roundRect(x,by+bh-bH,bW,bH,2);ctx.fill();
-      const pct=Math.round(d.v*100)+'%';
-      ctx.fillStyle='rgba(255,255,255,.9)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-      if(bH>16)ctx.fillText(pct,x+bW/2,by+bh-bH+12);
-      else if(bH>2&&ap>.6)ctx.fillText(pct,x+bW/2,by+bh-bH-4);
-      if(xlbls&&xlbls[i]){ctx.fillStyle='rgba(170,175,200,.8)';ctx.font='8px sans-serif';ctx.textAlign='center';ctx.fillText(xlbls[i],x+bW/2,by+bh+13);}
+      const x=bx+i*sw+(sw-bW)/2,bH=Math.max(2,d.v*bh*ap);
+      ctx.fillStyle=d.col;ctx.beginPath();ctx.roundRect(x,by+bh-bH,bW,bH,3);ctx.fill();
+      const pct=d.v<.005?'0%':Math.round(d.v*100)+'%';
+      ctx.fillStyle='rgba(240,240,255,.95)';ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';
+      if(bH>18)ctx.fillText(pct,x+bW/2,by+bh-bH+13);
+      else if(bH>2&&ap>.5)ctx.fillText(pct,x+bW/2,by+bh-bH-5);
+      if(xlbls&&xlbls[i]){ctx.fillStyle='rgba(180,190,215,.8)';ctx.font=`${(lfs||10)-1}px sans-serif`;ctx.textAlign='center';ctx.fillText(xlbls[i],x+bW/2,by+bh+15);}
     });
   }
+
+  function banner(label,col,bgcol,y,w){
+    ctx.fillStyle=bgcol;ctx.beginPath();ctx.roundRect(20,y,w-40,22,8);ctx.fill();
+    ctx.fillStyle=col;ctx.font='bold 10px monospace';ctx.textAlign='center';ctx.fillText(label,w/2,y+14);
+  }
+
+  function phase0(p,w,h){
+    const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
+    banner('▶  TIER 1 · BENIGN  —  Turkey  —  "How important are friends in your life?"  (1=Very  4=Not)','rgba(180,205,255,.95)','rgba(70,110,200,.18)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(220,228,255,.82)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillText('"How important are friends in your life?"',w/2,54);
+    ctx.fillStyle='rgba(160,180,220,.75)';ctx.font='12px sans-serif';
+    ctx.fillText('Persona: "Imagine you are a Turkish person."  ·  Scale 1 (Very important) → 4 (Not important)',w/2,74);
+    const by=96,bh=Math.min(145,h-200);
+    const human=[{v:.62,col:'rgba(200,165,20,.9)'},{v:.35,col:'rgba(200,155,15,.75)'},{v:.03,col:'rgba(200,145,10,.55)'},{v:.00,col:'rgba(200,140,8,.3)'}];
+    bars(human,['1','2','3','4'],40,by,(w-80),bh,eO(p),'Human survey — Turkey (WVS Wave 7)','rgba(200,165,20,.85)');
+    ctx.globalAlpha=ap*apL;
+    ctx.fillStyle='rgba(200,165,20,.85)';ctx.font='bold 11.5px sans-serif';ctx.textAlign='center';
+    ctx.fillText('62% say "Very important" — strong social cohesion norms in Turkish society',w/2,by+bh+28);
+    ctx.fillStyle='rgba(160,180,210,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('Next: we ask the model to answer as a Turkish persona → it refuses',w/2,by+bh+48);
+    ctx.globalAlpha=1;
+  }
+
+  function phase1(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
+    banner('TIER 1 · MODEL RESPONSE — REFUSES','rgba(180,205,255,.95)','rgba(70,110,200,.15)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(220,228,255,.88)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillText('"I don\'t have personal experiences or preferences…"',w/2,52);
+    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('Model declines. Standard assumption: it lacks cultural knowledge about Turkey.',w/2,72);
+    const by=92,bh=Math.min(140,h-210);
+    const rtoks=['I','don\'t','have','personal','…'];
+    const rvals=[{v:.42,col:'rgba(80,120,210,.75)'},{v:.28,col:'rgba(80,120,210,.65)'},{v:.15,col:'rgba(80,120,210,.55)'},{v:.09,col:'rgba(80,120,210,.45)'},{v:.06,col:'rgba(80,120,210,.35)'}];
+    bars(rvals,rtoks,40,by,w-80,bh,eO(Math.min(p*3,1)),'Logit probability of refusal tokens at generation step 0','rgba(100,140,220,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.fillStyle='rgba(220,195,80,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('But what if we look deeper — at the scale option logits hidden beneath the refusal?',w/2,by+bh+28);
+    ctx.fillStyle='rgba(160,180,210,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('We renormalise the final-layer logits over just {1, 2, 3, 4} → forced-choice distribution',w/2,by+bh+48);
+    ctx.globalAlpha=1;
+  }
+
+  function phase2(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.5)/.5,0));
+    banner('TIER 1 · ZOOMING INTO SCALE OPTIONS — EV-NVAS at refusal','rgba(180,205,255,.95)','rgba(70,110,200,.15)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(160,180,215,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Renormalise logits over options {1, 2, 3, 4} at the refusal moment',w/2,48);
+    const half=w/2-10;
+    const by=62,bh=Math.min(135,h-210);
+    const internal=[{v:.20,col:'rgba(80,120,210,.8)'},{v:.23,col:'rgba(80,120,210,.72)'},{v:.27,col:'rgba(80,120,210,.64)'},{v:.30,col:'rgba(80,120,210,.55)'}];
+    const human=[{v:.62,col:'rgba(200,165,20,.88)'},{v:.35,col:'rgba(200,155,15,.75)'},{v:.03,col:'rgba(200,145,10,.55)'},{v:.00,col:'rgba(200,140,8,.25)'}];
+    bars(internal,['1','2','3','4'],24,by,half-12,bh,eO(p),'Internal (EV-NVAS)','rgba(100,145,220,.85)',10);
+    bars(human,['1','2','3','4'],half+12,by,half-12,bh,eO(p),'Human survey (Turkey)','rgba(200,165,20,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.fillStyle='rgba(160,180,215,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Internal ≈ uniform (20/23/27/30%)  vs  Human concentrated at 62% option 1',w/2,by+bh+28);
+    ctx.fillStyle='rgba(180,205,160,.85)';ctx.font='bold 12px sans-serif';
+    ctx.fillText('✓  Internal ≠ Human → model genuinely has no cultural knowledge here',w/2,by+bh+50);
+    ctx.fillStyle='rgba(160,180,210,.65)';ctx.font='11px sans-serif';
+    ctx.fillText('Tier 1 refusal is honest: the model does not know → uniform uncertainty',w/2,by+bh+70);
+    ctx.globalAlpha=1;
+  }
+
+  function phase3(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
+    banner('TIER 1 · EXPRESSED ANSWER (when not refusing)','rgba(160,220,185,.9)','rgba(26,130,80,.15)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Across conditions where model does answer (no refusal), how does it respond?',w/2,46);
+    const half=w/2-10;
+    const by=60,bh=Math.min(140,h-200);
+    const expr=[{v:.88,col:'rgba(26,155,90,.88)'},{v:.10,col:'rgba(26,145,80,.72)'},{v:.02,col:'rgba(26,135,70,.5)'},{v:.00,col:'rgba(26,125,60,.25)'}];
+    const human=[{v:.62,col:'rgba(200,165,20,.88)'},{v:.35,col:'rgba(200,155,15,.75)'},{v:.03,col:'rgba(200,145,10,.55)'},{v:.00,col:'rgba(200,140,8,.25)'}];
+    bars(expr,['1','2','3','4'],24,by,half-12,bh,eO(p),'Expressed answer','rgba(26,160,90,.85)',10);
+    bars(human,['1','2','3','4'],half+12,by,half-12,bh,eO(p),'Human survey (Turkey)','rgba(200,165,20,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.strokeStyle='rgba(26,160,90,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
+    const cy=by+bh*.38;
+    ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(26,180,100,.9)';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('≈ Similar  (NVAS ≈ 0.87)',w/2,cy-6);
+    ctx.fillStyle='rgba(180,215,170,.85)';ctx.font='bold 12px sans-serif';
+    ctx.fillText('✓  Tier 1: Expressed ≈ Human — genuine cultural uncertainty, honest refusal',w/2,by+bh+28);
+    ctx.fillStyle='rgba(160,180,210,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('This confirms Tier 1 is not suppression. Now watch what changes for Tier 3…',w/2,by+bh+50);
+    ctx.globalAlpha=1;
+  }
+
+  function phase4(p,w,h){
+    const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
+    banner('▶  TIER 3 · SENSITIVE  —  Egypt  —  "Would you be comfortable having homosexuals as neighbors?"','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillText('"Would you be comfortable having homosexuals as neighbors?"',w/2,54);
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='12px sans-serif';
+    ctx.fillText('Persona: "Imagine you are an Egyptian person."  ·  Scale 1 (No) · 2 (Yes)',w/2,74);
+    const by=94,bh=Math.min(155,h-200);
+    const human=[{v:.84,col:'rgba(200,165,20,.9)'},{v:.16,col:'rgba(200,155,15,.65)'}];
+    bars(human,['1 = No','2 = Yes'],80,by,w-160,bh,eO(p),'Human survey — Egypt (WVS / AOI)','rgba(200,165,20,.85)',11);
+    ctx.globalAlpha=ap*apL;
+    ctx.fillStyle='rgba(255,175,170,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('84% say "No" — conservative norms in Egyptian society on this question',w/2,by+bh+28);
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('Now we ask the model to respond as an Egyptian persona → it also refuses',w/2,by+bh+50);
+    ctx.globalAlpha=1;
+  }
+
+  function phase5(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
+    banner('TIER 3 · MODEL REFUSES — same as Tier 1?','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillText('"As an AI assistant, I cannot make judgments on this topic…"',w/2,52);
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('Model declines again. Standard assumption: same as Tier 1 — lacks knowledge.',w/2,72);
+    const by=90,bh=Math.min(140,h-210);
+    const rtoks=['As','an','AI','cannot','…'];
+    const rvals=[{v:.40,col:'rgba(200,70,70,.78)'},{v:.25,col:'rgba(200,70,70,.68)'},{v:.18,col:'rgba(200,70,70,.58)'},{v:.12,col:'rgba(200,70,70,.48)'},{v:.05,col:'rgba(200,70,70,.38)'}];
+    bars(rvals,rtoks,40,by,w-80,bh,eO(Math.min(p*3,1)),'Logit probability of refusal tokens at generation step 0','rgba(210,80,80,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.fillStyle='rgba(255,210,80,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Same output — but the scale option logits tell a completely different story',w/2,by+bh+28);
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillText('Unlike Tier 1 (uniform uncertainty), Tier 3 internal distribution is concentrated…',w/2,by+bh+50);
+    ctx.globalAlpha=1;
+  }
+
+  function phase6(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
+    banner('TIER 3 · EV-NVAS: INTERNAL DISTRIBUTION AT REFUSAL','rgba(255,165,160,.9)','rgba(178,34,34,.1)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Renormalise logits over options {1, 2} at refusal moment — what does the model internally "know"?',w/2,46);
+    const half=w/2-10;
+    const by=60,bh=Math.min(155,h-210);
+    const evnvas=[{v:.88,col:'rgba(200,70,70,.85)'},{v:.12,col:'rgba(60,185,120,.8)'}];
+    const human=[{v:.84,col:'rgba(200,165,20,.9)'},{v:.16,col:'rgba(200,155,15,.65)'}];
+    bars(evnvas,['1=No','2=Yes'],24,by,half-12,bh,eO(p),'Internal EV-NVAS at refusal','rgba(220,150,12,.85)',10);
+    bars(human,['1=No','2=Yes'],half+12,by,half-12,bh,eO(p),'Human survey (Egypt)','rgba(200,165,20,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.strokeStyle='rgba(26,180,110,.5)';ctx.lineWidth=1.8;ctx.setLineDash([4,3]);
+    const cy=by+bh*.2;
+    ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(60,200,130,.95)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('≈ MATCH  —  88% / 12%  vs  84% / 16%',w/2,cy-7);
+    ctx.fillStyle='rgba(200,225,195,.88)';ctx.font='bold 13px sans-serif';
+    ctx.fillText('★  The model KNOWS Egypt says No — it encodes the cultural knowledge',w/2,by+bh+28);
+    ctx.fillStyle='rgba(255,200,100,.85)';ctx.font='bold 11.5px sans-serif';
+    ctx.fillText('But it is about to express the exact opposite…',w/2,by+bh+50);
+    ctx.globalAlpha=1;
+  }
+
+  function phase7(p,w,h){
+    const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
+    const pulse=.85+.15*Math.sin(t*3.2);
+    banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(255,130,130,.95)','rgba(178,34,34,.18)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillText('When the model does express an answer on T3 (forced or bypassed), what does it say?',w/2,46);
+    const half=w/2-10;
+    const by=60,bh=Math.min(155,h-215);
+    const expr=[{v:.001,col:'rgba(200,70,70,.25)'},{v:.999,col:'rgba(60,185,120,.9)'}];
+    const human=[{v:.84,col:'rgba(200,165,20,.9)'},{v:.16,col:'rgba(200,155,15,.65)'}];
+    bars(expr,['1=No','2=Yes'],24,by,half-12,bh,eO(p),'Expressed answer','rgba(220,80,80,.85)',10);
+    bars(human,['1=No','2=Yes'],half+12,by,half-12,bh,eO(p),'Human survey (Egypt)','rgba(200,165,20,.85)',10);
+    ctx.globalAlpha=ap*apL;
+    ctx.strokeStyle='rgba(220,60,60,.45)';ctx.lineWidth=1.8;ctx.setLineDash([4,3]);
+    const cy=by+bh*.55;
+    ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(240,100,100,.9)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillText('≠ WRONG  —  ~100% Yes  vs  84% No',w/2,cy-7);
+    ctx.fillStyle=`rgba(178,34,34,${pulse*.18})`;ctx.beginPath();ctx.roundRect(w/2-142,by+bh+20,284,34,8);ctx.fill();
+    ctx.strokeStyle=`rgba(220,60,60,${pulse*.7})`;ctx.lineWidth=1.5;ctx.stroke();
+    ctx.fillStyle=`rgba(255,100,100,${pulse})`;ctx.font=`bold 14px sans-serif`;ctx.textAlign='center';
+    ctx.fillText('⚠  THE ALIGNMENT VETO',w/2,by+bh+42);
+    ctx.fillStyle='rgba(255,190,180,.8)';ctx.font='11.5px sans-serif';
+    ctx.fillText('Internal EV-NVAS=0.718 (knows 84% No) · Expressed NVAS=0.312 (says ~100% Yes)',w/2,by+bh+66);
+    ctx.globalAlpha=1;
+  }
+
+  function phase8(p,w,h){
+    const ap=eO(Math.min(p*4,1));
+    banner('SUMMARY — THE ALIGNMENT VETO','rgba(240,220,180,.9)','rgba(160,120,10,.15)',6,w);
+    ctx.globalAlpha=ap;
+    ctx.fillStyle='rgba(220,210,180,.85)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillText('Two tiers, same refusal — completely different internal realities',w/2,50);
+    const rows=[
+      {lbl:'T1 · Benign',int:'≈ Uniform (20/23/27/30%)',exp:'≈ Human (88/10/2/0%)',match:'✓  Genuine uncertainty',mcol:'rgba(60,200,130,.9)',bc:'rgba(70,120,210,.18)'},
+      {lbl:'T3 · Sensitive',int:'88% No · 12% Yes  (= Human!)',exp:'~100% Yes  ← WRONG','match':'⚠  ALIGNMENT VETO',mcol:'rgba(240,90,90,.95)',bc:'rgba(178,34,34,.12)'}
+    ];
+    const tw=w-60;
+    const cols=[.21,.31,.31,.17];
+    const hdrs=['Question','Internal (EV-NVAS)','Expressed','Verdict'];
+    const ty=66;
+    let cx=30;
+    hdrs.forEach((h2,i)=>{
+      const cw=tw*cols[i];
+      ctx.fillStyle='rgba(200,175,40,.8)';ctx.font='bold 8.5px monospace';ctx.textAlign='center';
+      ctx.fillText(h2.toUpperCase(),cx+cw/2,ty+14);
+      ctx.strokeStyle='rgba(200,175,40,.2)';ctx.lineWidth=1;
+      ctx.beginPath();ctx.moveTo(cx+2,ty+19);ctx.lineTo(cx+cw-2,ty+19);ctx.stroke();
+      cx+=cw;
+    });
+    rows.forEach((row,ri)=>{
+      const ry=ty+26+ri*Math.min(82,Math.floor((h-ty-130)/2));
+      const ra=eO(Math.min((p-(ri*.25))/.6,1));
+      ctx.globalAlpha=ap*ra;
+      ctx.fillStyle=row.bc;ctx.beginPath();ctx.roundRect(30,ry,tw,Math.min(80,Math.floor((h-ty-130)/2)-4),6);ctx.fill();
+      let cx2=30;
+      const cells=[row.lbl,row.int,row.exp];
+      const cellC=['rgba(215,225,255,.9)','rgba(100,150,230,.88)','rgba(220,100,100,.9)'];
+      cells.forEach((cell,ci)=>{
+        const cw=tw*cols[ci];
+        ctx.fillStyle=cellC[ci];ctx.font=ci===0?'bold 10px sans-serif':'10px sans-serif';ctx.textAlign='center';
+        ctx.fillText(cell,cx2+cw/2,ry+Math.min(80,Math.floor((h-ty-130)/2)-4)/2+4);
+        cx2+=cw;
+      });
+      ctx.fillStyle=row.mcol;ctx.font='bold 10.5px sans-serif';ctx.textAlign='center';
+      ctx.fillText(row.match,cx2+tw*cols[3]/2,ry+Math.min(80,Math.floor((h-ty-130)/2)-4)/2+4);
+      ctx.globalAlpha=ap;
+    });
+    const bot=ty+26+rows.length*Math.min(82,Math.floor((h-ty-130)/2))+12;
+    const apF=eO(Math.max((p-.6)/.4,0));ctx.globalAlpha=ap*apF;
+    ctx.fillStyle='rgba(220,195,80,.95)';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+    ctx.fillText('"The model knows. It just won\'t say so."',w/2,bot);
+    ctx.fillStyle='rgba(180,195,220,.78)';ctx.font='11px sans-serif';
+    ctx.fillText('EV-NVAS: 0.718  vs  NVAS: 0.690  (Δ=+0.029, p<10⁻¹³,  19 of 24 models above diagonal)',w/2,bot+22);
+    ctx.globalAlpha=1;
+  }
+
+  const PHASES=[phase0,phase1,phase2,phase3,phase4,phase5,phase6,phase7,phase8];
 
   function render(){
     const {w,h}=dim;
     ctx.clearRect(0,0,w,h);
     if(!revealed)return;
-    buildP=Math.min(1,buildP+.006);
     t+=1/60;
-    const bp=eO(buildP);
-
-    const PAD=14,midY=Math.round(h*.48),divH=8;
-    const t1top=4,t1h=midY-t1top-divH/2;
-    const t3top=midY+divH/2,t3h=h-t3top-4;
-    const third=(w-PAD*2)/3;
-    const barsH=Math.min(112,Math.floor(t1h-78));
-    const t3barsH=Math.min(120,Math.floor(t3h-84));
-
-    // ─── T1 PANEL ───────────────────────────────────────────────────────
-    ctx.fillStyle='rgba(91,130,200,.15)';ctx.beginPath();ctx.roundRect(PAD,t1top,w-PAD*2,20,10);ctx.fill();
-    ctx.fillStyle='rgba(160,190,255,.9)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-    ctx.fillText('TIER 1 · BENIGN  |  Turkey  |  “How important are friends in your life?”  (1=Very important … 4=Not important)',w/2,t1top+13);
-
-    const t1barsTop=t1top+30;
-    const lx4=['1','2','3','4'];
-    drawBars([{v:.20,col:'rgba(91,130,200,.65)'},{v:.23,col:'rgba(91,130,200,.6)'},{v:.27,col:'rgba(91,130,200,.55)'},{v:.30,col:'rgba(91,130,200,.5)'}],lx4,PAD,t1barsTop,third-6,barsH,bp,'Internal @ refusal (EV-NVAS)','rgba(91,130,200,.85)');
-    drawBars([{v:.88,col:'rgba(26,138,108,.85)'},{v:.10,col:'rgba(26,138,108,.65)'},{v:.02,col:'rgba(26,138,108,.5)'},{v:.00,col:'rgba(26,138,108,.3)'}],lx4,PAD+third,t1barsTop,third-6,barsH,bp,'Expressed answer','rgba(26,138,108,.85)');
-    drawBars([{v:.62,col:'rgba(200,150,12,.85)'},{v:.35,col:'rgba(200,150,12,.7)'},{v:.03,col:'rgba(200,150,12,.55)'},{v:.00,col:'rgba(200,150,12,.35)'}],lx4,PAD+third*2,t1barsTop,third-6,barsH,bp,'Human survey (Turkey)','rgba(200,150,12,.85)');
-
-    const t1vY=t1barsTop+barsH+22;
-    if(buildP>.5){
-      const ap2=eO((buildP-.5)/.5);ctx.globalAlpha=ap2;
-      ctx.fillStyle='rgba(91,130,200,.75)';ctx.font='8.5px sans-serif';ctx.textAlign='left';
-      ctx.fillText('Internal ≈ uniform → no cultural knowledge encoded',PAD,t1vY);
-      ctx.fillStyle='rgba(26,138,108,.75)';ctx.textAlign='right';
-      ctx.fillText('Expressed ≈ human (NVAS≈0.87)',w-PAD,t1vY);
-      ctx.fillStyle='rgba(160,165,195,.55)';ctx.font='bold 8px sans-serif';ctx.textAlign='center';
-      ctx.fillText('✓  Genuine uncertainty — no knowledge suppressed',w/2,t1vY+13);
-      ctx.globalAlpha=1;
+    let elapsed=t%TOTAL,ph=0,phT=0;
+    for(let i=0;i<DUR.length;i++){
+      if(elapsed<DUR[i]){ph=i;phT=elapsed/DUR[i];break;}
+      elapsed-=DUR[i];
     }
-
-    // ─── Divider ────────────────────────────────────────────────────────
-    const gd=ctx.createLinearGradient(0,0,w,0);
-    gd.addColorStop(0,'transparent');gd.addColorStop(.25,'rgba(122,138,170,.3)');
-    gd.addColorStop(.75,'rgba(122,138,170,.3)');gd.addColorStop(1,'transparent');
-    ctx.strokeStyle=gd;ctx.lineWidth=1;
-    ctx.beginPath();ctx.moveTo(PAD,midY);ctx.lineTo(w-PAD,midY);ctx.stroke();
-
-    // ─── T3 PANEL ───────────────────────────────────────────────────────
-    ctx.fillStyle='rgba(178,34,34,.1)';ctx.beginPath();ctx.roundRect(PAD,t3top,w-PAD*2,20,10);ctx.fill();
-    ctx.fillStyle='rgba(255,100,100,.9)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-    ctx.fillText('TIER 3 · SENSITIVE  |  Egypt  |  “Would you be comfortable having homosexuals as neighbors?”  (1=No  2=Yes)',w/2,t3top+13);
-
-    const t3barsTop=t3top+30;
-    const lx2=['1 = No','2 = Yes'];
-    drawBars([{v:.88,col:'rgba(200,80,80,.8)'},{v:.12,col:'rgba(80,190,130,.65)'}],lx2,PAD,t3barsTop,third-6,t3barsH,bp,'Internal @ refusal (EV-NVAS)','rgba(200,150,12,.9)');
-    drawBars([{v:.0001,col:'rgba(200,80,80,.25)'},{v:.9999,col:'rgba(80,190,130,.85)'}],lx2,PAD+third,t3barsTop,third-6,t3barsH,bp,'Expressed answer','rgba(240,80,80,.9)');
-    drawBars([{v:.84,col:'rgba(200,150,12,.85)'},{v:.16,col:'rgba(200,150,12,.6)'}],lx2,PAD+third*2,t3barsTop,third-6,t3barsH,bp,'Human survey (Egypt)','rgba(200,150,12,.85)');
-
-    if(buildP>.6){
-      const ap3=eO((buildP-.6)/.4);ctx.globalAlpha=ap3;
-      const intCX=PAD+third/2,humCX=PAD+third*2.5;
-      const aY=t3barsTop-16;
-      ctx.strokeStyle='rgba(26,138,108,.45)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
-      ctx.beginPath();ctx.moveTo(intCX,aY);ctx.lineTo(humCX,aY);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='rgba(26,138,108,.85)';ctx.font='bold 8.5px sans-serif';ctx.textAlign='center';
-      ctx.fillText('≈ MATCH  88%/12% vs 84%/16%',(intCX+humCX)/2,aY-4);
-      const expCX=PAD+third*1.5;
-      ctx.strokeStyle='rgba(220,60,60,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,3]);
-      ctx.beginPath();ctx.moveTo(expCX,aY+4);ctx.lineTo(humCX,aY+18);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='rgba(220,60,60,.85)';ctx.font='bold 8.5px sans-serif';
-      ctx.fillText('≠ WRONG  ~100% vs 84% No',(expCX+humCX)/2+14,aY+32);
-      ctx.globalAlpha=1;
-    }
-
-    const t3vY=t3barsTop+t3barsH+22;
-    if(buildP>.7){
-      const ap4=eO((buildP-.7)/.3);ctx.globalAlpha=ap4;
-      ctx.fillStyle='rgba(200,150,12,.85)';ctx.font='8.5px sans-serif';ctx.textAlign='left';
-      ctx.fillText('Internal ≈ human (84%/16%) → model KNOWS Egypt says No',PAD,t3vY);
-      ctx.fillStyle='rgba(240,80,80,.85)';ctx.textAlign='right';
-      ctx.fillText('Expressed: ~100% Yes → safety-trained override',w-PAD,t3vY);
-      const pulse=.85+.15*Math.sin(t*3.5);
-      ctx.fillStyle=`rgba(178,34,34,${pulse*.15})`;ctx.beginPath();ctx.roundRect(w/2-105,t3vY+7,210,22,5);ctx.fill();
-      ctx.strokeStyle=`rgba(220,60,60,${pulse*.6})`;ctx.lineWidth=1.2;ctx.stroke();
-      ctx.fillStyle=`rgba(240,80,80,${pulse})`;ctx.font=`bold ${Math.min(11,w*.022)}px sans-serif`;ctx.textAlign='center';
-      ctx.fillText('⚠  ALIGNMENT VETO',w/2,t3vY+22);
-      ctx.globalAlpha=1;
-    }
+    // phase indicator dots
+    const dotR=4,dotY=h-10;
+    PHASES.forEach((_,i)=>{
+      ctx.beginPath();ctx.arc(w/2+(i-4)*14,dotY,dotR,0,6.28);
+      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
+    });
+    PHASES[ph](phT,w,h);
   }
 
-  function frame(){
-    render();
-    requestAnimationFrame(frame);
-  }
+  function frame(){render();requestAnimationFrame(frame);}
   requestAnimationFrame(frame);
-})();
+
 
 
 /* ═══════ SUPPRESSION SCATTER (19/24 above diagonal) ═══════ */

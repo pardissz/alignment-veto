@@ -6,22 +6,22 @@
 <title>The Alignment Veto</title>
 <style>
 :root{
-  --bg:#ffffff;--bg2:#f3f5fb;--bg3:#e7ecf8;
-  --gold:#a07600;--gold2:#b88a00;--gold3:#5c3f00;
-  --red:#b22222;--red2:#cc2200;--red3:#8b0000;
-  --teal:#1a7a5c;--teal2:#1a8044;--teal3:#0a5430;
-  --blue:#1a5a9a;--blue2:#1a5fa0;--blue3:#0d3f6e;
-  --purple:#6c3483;--purple2:#7d3c98;
-  --text:#0e1428;--muted:#485070;--border:rgba(0,0,0,.1);
+  --bg:#07091a;--bg2:#0c1028;--bg3:#111840;
+  --gold:#C8960C;--gold2:#F0B730;--gold3:#fff3cc;
+  --red:#b22222;--red2:#e74c3c;--red3:#ff9999;
+  --teal:#1A8A6C;--teal2:#27AE60;--teal3:#a8e6cf;
+  --blue:#1a5a9a;--blue2:#5B9BD5;--blue3:#b8d9f5;
+  --purple:#6c3483;--purple2:#9b59b6;
+  --text:#f0f4ff;--muted:#a8b4d0;--border:rgba(255,255,255,.1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'Georgia',serif;line-height:1.7;overflow-x:hidden}
-#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.12}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.55}
 .z1{position:relative;z-index:1}
 
 /* NAV */
-nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid rgba(0,0,0,.1);padding:.6rem 2rem;display:flex;gap:1.8rem;align-items:center;flex-wrap:wrap;box-shadow:0 1px 8px rgba(0,0,0,.06)}
+nav{position:fixed;top:0;width:100%;z-index:200;background:rgba(7,9,26,.82);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:.6rem 2rem;display:flex;gap:1.8rem;align-items:center;flex-wrap:wrap}
 .nav-logo{font-family:monospace;font-size:.75rem;font-weight:700;color:var(--gold);letter-spacing:.18em;text-transform:uppercase;margin-right:.5rem}
 nav a{color:var(--muted);text-decoration:none;font-size:.75rem;letter-spacing:.06em;transition:color .2s;font-family:sans-serif}
 nav a:hover{color:var(--gold2)}
@@ -30,7 +30,7 @@ nav a:hover{color:var(--gold2)}
 section{position:relative;z-index:1;padding:5.5rem 2rem}
 .container{max-width:940px;margin:0 auto}
 .wide{max-width:1180px;margin:0 auto}
-.alt{background:#f0f3fb}
+.alt{background:rgba(12,16,40,.65)}
 
 /* HEADINGS */
 h1{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.13;font-weight:700;margin-bottom:1.2rem}
@@ -53,20 +53,20 @@ h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
 
 /* STATS */
 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.85rem;margin-top:2rem}
-.stat{background:#f4f7ff;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:1.1rem .8rem;text-align:center;transition:border-color .3s}
+.stat{background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:8px;padding:1.1rem .8rem;text-align:center;transition:border-color .3s}
 .stat:hover{border-color:var(--gold)}
 .stat-n{font-size:1.9rem;font-weight:700;color:var(--gold2);display:block;font-family:sans-serif;line-height:1.1}
 .stat-l{font-size:.68rem;color:var(--muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.09em;margin-top:.2rem}
 
 /* CANVAS WRAPPERS */
-.cvs-box{border-radius:10px;overflow:hidden;background:#ffffff;border:1px solid rgba(0,0,0,.08);position:relative;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.cvs-box{border-radius:10px;overflow:hidden;background:#07091a;position:relative}
 .cvs-box canvas{display:block;width:100%;height:100%}
 
 /* CARDS */
-.card{background:#f8faff;border:1px solid rgba(0,0,0,.08);border-radius:10px;padding:1.4rem}
+.card{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:10px;padding:1.4rem}
 .card.red-bd{border-color:rgba(178,34,34,.45)}
-.paper-fig{margin:2.2rem 0;border:1px solid rgba(0,0,0,.08);border-radius:10px;overflow:hidden;background:#ffffff;box-shadow:0 1px 6px rgba(0,0,0,.07)}
-.paper-fig img{width:100%;height:auto;display:block;border-bottom:1px solid rgba(0,0,0,.07)}
+.paper-fig{margin:2.2rem 0;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:rgba(255,255,255,.03)}
+.paper-fig img{width:100%;height:auto;display:block;border-bottom:1px solid var(--border)}
 .paper-fig figcaption{padding:.75rem 1.2rem;font-size:.78rem;color:var(--muted);font-family:sans-serif;line-height:1.7}
 .paper-fig figcaption strong{color:var(--text)}
 .paper-fig .fig-lbl{display:inline-block;font-size:.68rem;font-family:monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:.3rem}
@@ -83,14 +83,14 @@ h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
 /* TABLES */
 table{width:100%;border-collapse:collapse;font-family:sans-serif;font-size:.85rem;margin:1.2rem 0}
 th{color:var(--gold);text-align:left;padding:.5rem .7rem;border-bottom:1px solid var(--border);font-size:.75rem;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
-td{padding:.5rem .7rem;border-bottom:1px solid rgba(0,0,0,.05);color:var(--muted);vertical-align:middle}
-tr:hover td{background:rgba(0,0,0,.02)}
+td{padding:.5rem .7rem;border-bottom:1px solid rgba(255,255,255,.05);color:var(--muted);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,.02)}
 tr.hl td{color:var(--text);font-weight:600}
 
 /* BARS */
 .bar-row{display:flex;align-items:center;gap:.7rem;margin-bottom:.55rem}
 .bar-lbl{width:190px;font-size:.75rem;font-family:monospace;color:var(--muted);text-align:right;flex-shrink:0}
-.bar-track{flex:1;height:20px;background:rgba(0,0,0,.07);border-radius:3px;overflow:hidden}
+.bar-track{flex:1;height:20px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden}
 .bar-fill{height:100%;border-radius:3px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
 .bar-val{width:52px;font-size:.72rem;font-family:monospace;flex-shrink:0}
 
@@ -104,12 +104,12 @@ tr.hl td{color:var(--text);font-weight:600}
 .stage-sub{font-size:.7rem;color:var(--muted);font-family:sans-serif;margin-top:.25rem}
 
 /* SCATTER */
-.scatter-wrap{position:relative;height:380px;margin:1.5rem 0;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.07)}
+.scatter-wrap{position:relative;height:380px;margin:1.5rem 0}
 .scatter-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* METERS (SAE) */
 .meter-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2rem;margin:1.5rem 0}
-.meter{background:#f4f7ff;border-radius:10px;padding:1.4rem;text-align:center;border:1px solid rgba(0,0,0,.08);overflow:hidden;position:relative}
+.meter{background:rgba(255,255,255,.04);border-radius:10px;padding:1.4rem;text-align:center;border:1px solid var(--border);overflow:hidden;position:relative}
 .meter-fill{position:absolute;bottom:0;left:0;right:0;transition:height 1.4s cubic-bezier(.4,0,.2,1);height:0}
 .meter-content{position:relative;z-index:1}
 .meter-pct{font-size:2.4rem;font-weight:700;font-family:sans-serif;display:block;line-height:1.1}
@@ -124,7 +124,7 @@ tr.hl td{color:var(--text);font-weight:600}
 
 /* STEPS */
 .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1rem;margin:1.5rem 0}
-.step{background:#f6f8ff;border-radius:8px;padding:1.2rem;border:1px solid rgba(0,0,0,.08)}
+.step{background:rgba(255,255,255,.03);border-radius:8px;padding:1.2rem;border:1px solid var(--border)}
 .step-n{font-size:1.8rem;font-weight:700;color:var(--gold);opacity:.35;line-height:1;display:block;font-family:sans-serif}
 .step-t{font-size:.88rem;font-weight:700;margin:.2rem 0}
 .step-b{font-size:.78rem;color:var(--muted);font-family:sans-serif}
@@ -147,7 +147,7 @@ blockquote{border-left:3px solid var(--gold);padding:.9rem 1.4rem;margin:1.8rem 
 blockquote strong{color:var(--text)}
 
 /* CODE/PRE */
-pre{background:#f0f2f8;border:1px solid rgba(0,0,0,.08);border-radius:8px;padding:1.4rem;font-size:.8rem;color:var(--text);overflow-x:auto;font-family:monospace;line-height:1.6}
+pre{background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;padding:1.4rem;font-size:.8rem;color:var(--muted);overflow-x:auto;font-family:monospace;line-height:1.6}
 code{font-family:monospace;font-size:.85em;color:var(--gold2);background:rgba(200,150,12,.08);padding:.1rem .3rem;border-radius:3px}
 
 /* TOOLTIP */
@@ -160,7 +160,7 @@ code{font-family:monospace;font-size:.85em;color:var(--gold2);background:rgba(20
 .legend span{display:flex;align-items:center;gap:.35rem}
 
 /* FOOTER */
-footer{background:var(--bg2);border-top:1px solid rgba(0,0,0,.08);padding:2rem;text-align:center;font-family:sans-serif;font-size:.78rem;color:var(--muted);position:relative;z-index:1}
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:2rem;text-align:center;font-family:sans-serif;font-size:.78rem;color:var(--muted);position:relative;z-index:1}
 footer a{color:var(--gold);text-decoration:none}
 </style>
 </head>
@@ -173,8 +173,6 @@ footer a{color:var(--gold);text-decoration:none}
   <span class="nav-logo">Alignment Veto</span>
   <a href="#overview">Overview</a>
   <a href="#concept">Concept</a>
-  <a href="#pipeline">Pipeline</a>
-  <a href="#taxonomy">Taxonomy</a>
   <a href="#tax">Safety Tax</a>
   <a href="#countries">Equity</a>
   <a href="#framing">Framing</a>
@@ -298,7 +296,8 @@ footer a{color:var(--gold);text-decoration:none}
         <strong style="color:var(--teal2)">Range: 0 → 1</strong> &nbsp;·&nbsp; <strong style="color:var(--red2)">0 = worst</strong> (opposite extreme) &nbsp;·&nbsp; <strong style="color:var(--teal2)">1 = perfect</strong> (exact match)<br/><br/>
         <em>Live demo below:</em> Human mean = <strong style="color:var(--gold2)">3.2</strong> on a 1–10 scale. Watch NVAS rise to 1.0 when the model says ≈3.2, and fall toward 0 as it drifts in either direction. If the model says 1 (too low) <em>or</em> 10 (too high), it's equally wrong.
       </p>
-      <div class="cvs-box" id="nvas-explain-box" style="height:220px;margin-top:.8rem"><canvas id="nvas-explain-canvas"></canvas></div>
+      <div class="cvs-box" id="nvas-explain-box" style="height:168px;margin-top:.8rem"><canvas id="nvas-explain-canvas"></canvas></div>
+      <div style="text-align:center;margin-top:.5rem"><button id="nvas-next-btn" style="padding:.3rem 1.2rem;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold2);border-radius:4px;font-size:.78rem;font-family:sans-serif;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(200,150,12,.28)'" onmouseout="this.style.background='rgba(200,150,12,.15)'">Next example →</button></div>
     </div>
 
     <!-- EV-NVAS -->
@@ -372,7 +371,7 @@ footer a{color:var(--gold);text-decoration:none}
   </div>
 
   <!-- Paper Figure 1 -->
-  <figure class="paper-fig fi" style="margin-top:2rem">
+  <figure class="paper-fig fi" style="margin-top:2rem;max-width:520px;margin-left:auto;margin-right:auto">
     <img src="figures/fig1_concept.png" alt="Figure 1: Two failure modes — suppression and representational bias" loading="lazy"/>
     <figcaption>
       <span class="fig-lbl">Paper · Figure 1</span><br/>
@@ -399,92 +398,7 @@ footer a{color:var(--gold);text-decoration:none}
 </div>
 </section>
 
-<!-- ═══════════════════════ PIPELINE ═══════════════════════ -->
-<section id="pipeline">
-<div class="container">
-  <div class="divider"></div>
-  <div class="section-label">Gating, Not Erasing</div>
-  <h2>DPO Installs the Gate — <span class="accent">Without Erasing Knowledge</span></h2>
-  <p class="lead">The training pipeline tells us <em>when</em> suppression is installed. SFT improves cultural accuracy. DPO then adds refusals — but doesn't degrade the accuracy of answers that do get through. The gate is added; the representation survives.</p>
 
-  <!-- Animated dual-axis pipeline -->
-  <div class="cvs-box fi" style="height:320px" id="pipeline-box">
-    <canvas id="pipeline-canvas"></canvas>
-  </div>
-  <div class="legend" style="margin-top:.7rem">
-    <span><span class="ldot" style="background:var(--red2)"></span>T3 Refusal rate (DPO adds suppression)</span>
-    <span><span class="ldot" style="background:var(--teal2)"></span>NVAS on accepted T3 answers (stays up → not erased)</span>
-  </div>
-
-  <!-- Paper Figure 2 -->
-  <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig2_safety_tax.png" alt="Figure 2: T3 refusal rate by model and alignment stage" loading="lazy"/>
-    <figcaption>
-      <span class="fig-lbl">Paper · Figure 2</span><br/>
-      <strong>T3 refusal rate by model and alignment stage.</strong> Arabic-specialised models (ALLAM, Jais) show the highest safety taxes; GPT-5 is the only model with negative tax (−2.9%). Refusal is highest at the IT stage for most families, confirming DPO/RLHF as the installation step.
-    </figcaption>
-  </figure>
-
-  <div class="fi" style="margin-top:1.8rem">
-    <table>
-      <thead><tr><th>Stage</th><th>T3 Refusal</th><th>NVAS (accepted T3)</th><th>Interpretation</th></tr></thead>
-      <tbody>
-        <tr><td>OLMo-32B Base</td><td>20.5%</td><td>0.477</td><td style="color:var(--muted);font-size:.8rem">No gate yet — poor cultural accuracy</td></tr>
-        <tr><td>OLMo-32B SFT</td><td>9.3%</td><td style="color:var(--teal2)">0.599 (+0.122)</td><td style="color:var(--muted);font-size:.8rem">SFT: cultural knowledge installed</td></tr>
-        <tr><td>OLMo-32B DPO</td><td style="color:var(--red2)">18.6% ↑</td><td style="color:var(--teal2)">0.670 (+0.193)</td><td style="color:var(--gold);font-size:.8rem;font-weight:600">← DPO adds gate, NVAS still rises</td></tr>
-        <tr class="hl"><td>OLMo-32B IT</td><td style="color:var(--red2)">35.7% ↑↑</td><td style="color:var(--teal2)">0.667 (+0.190)</td><td style="color:var(--muted);font-size:.8rem">Gate widens; knowledge preserved</td></tr>
-      </tbody>
-    </table>
-    <p style="font-size:.8rem;color:var(--muted);font-family:sans-serif">
-      <strong style="color:var(--gold2)">Key insight:</strong> If alignment were erasing cultural representations, NVAS would drop as refusal rises. It doesn't. The gate and the representation are separate. SFT installs knowledge; DPO installs the filter.
-    </p>
-  </div>
-</div>
-</section>
-
-<!-- ═══════════════════════ TAXONOMY ═══════════════════════ -->
-<section id="taxonomy" class="alt">
-<div class="container">
-  <div class="divider"></div>
-  <div class="section-label">Two Failure Modes</div>
-  <h2>The T3 Question <span class="accent">Taxonomy</span></h2>
-  <p class="lead">Plotting refusal rate vs NVAS-when-answered for all 29 T3 questions reveals two empirically distinct clusters — each requiring a different fix.</p>
-
-  <div class="cvs-box fi" style="height:420px" id="taxonomy-box">
-    <canvas id="taxonomy-canvas"></canvas>
-  </div>
-  <div class="legend">
-    <span><span class="ldot" style="background:var(--red2)"></span>LGBTQ+ acceptance (suppression cluster)</span>
-    <span><span class="ldot" style="background:var(--blue2)"></span>Gender equality (representational bias cluster)</span>
-    <span><span class="ldot" style="background:var(--gold)"></span>Other T3 topics</span>
-  </div>
-  <div style="font-size:.8rem;color:var(--muted);font-family:sans-serif;margin-top:.8rem;text-align:center">
-    Hover dots for question topics · Quadrant lines: refusal=30%, NVAS=0.60
-  </div>
-
-  <!-- Paper Figure 5 -->
-  <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig3_taxonomy.png" alt="Figure 3: T3 failure taxonomy scatter — refusal rate vs NVAS" loading="lazy"/>
-    <figcaption>
-      <span class="fig-lbl">Paper · Figure 3</span><br/>
-      <strong>Failure taxonomy by T3 question (paper version).</strong> Each point is a T3 question averaged across all 26 models. Top-right quadrant (high refusal + high NVAS): suppression failures — knowledge is accurate but gated. Bottom-left (low refusal + low NVAS): representational bias — model answers freely but is wrong. The two clusters require different interventions.
-    </figcaption>
-  </figure>
-
-  <div class="two-col fi" style="margin-top:1.8rem">
-    <div class="card red-bd">
-      <div class="tag tag-r">Top-right quadrant · n=11</div>
-      <h3 style="margin-top:.5rem">Suppression failures</h3>
-      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Refusal ≥30%, NVAS ≥0.60. The model's internal distribution aligns with human data, but it refuses. Third-person framing partially unlocks these by shifting NVAS mean (though distributional JSD increases).</p>
-    </div>
-    <div class="card teal-bd">
-      <div class="tag tag-t">Bottom-left quadrant · n=9</div>
-      <h3 style="margin-top:.5rem">Representational bias</h3>
-      <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Refusal &lt;30%, NVAS &lt;0.60. The model answers freely but diverges from human survey data. No gate exists to bypass. Prompt engineering cannot help here — training data intervention required.</p>
-    </div>
-  </div>
-</div>
-</section>
 
 <!-- ═══════════════════════ SAFETY TAX ═══════════════════════ -->
 <section id="tax">
@@ -807,7 +721,7 @@ function easeInOut(t){return t<.5?4*t*t*t:(t-1)*(2*t-2)*(2*t-2)+1}
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 function hexAlpha(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`}
 
-const C={gold:'#a07600',gold2:'#b88a00',red:'#b22222',red2:'#cc2200',teal:'#1a7a5c',teal2:'#1a8044',blue:'#1a5a9a',blue2:'#1a5fa0',muted:'rgba(60,80,120,',text:'#0e1428',bg:'#ffffff'};
+const C={gold:'#C8960C',gold2:'#F0B730',red:'#b22222',red2:'#e74c3c',teal:'#1A8A6C',teal2:'#27AE60',blue:'#1a5a9a',blue2:'#5B9BD5',muted:'rgba(122,138,170,',text:'#f0f4ff',bg:'#07091a'};
 function resizeCanvas(c,wrap){
   const r=window.devicePixelRatio||1;
   const w=wrap.clientWidth,h=wrap.clientHeight;
@@ -893,13 +807,13 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   function bars(data,xlbls,bx,by,bw,bh,ap,title,tcol,lfs){
     const n=data.length,sw=bw/n,bW=sw*.62;
     if(title){ctx.fillStyle=tcol;ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';ctx.fillText(title,bx+bw/2,by-7);}
-    ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(180,185,220,.2)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,by+bh);ctx.lineTo(bx+bw,by+bh);ctx.stroke();
     data.forEach((d,i)=>{
       const x=bx+i*sw+(sw-bW)/2,bH=Math.max(2,d.v*bh*ap);
       ctx.fillStyle=d.col;ctx.beginPath();ctx.roundRect(x,by+bh-bH,bW,bH,3);ctx.fill();
       const pct=d.v<.005?'0%':Math.round(d.v*100)+'%';
-      ctx.fillStyle='rgba(14,20,50,.9)';ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';
+      ctx.fillStyle='rgba(232,236,244,.9)';ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';
       if(bH>18)ctx.fillText(pct,x+bW/2,by+bh-bH+13);
       else if(bH>2&&ap>.5)ctx.fillText(pct,x+bW/2,by+bh-bH-5);
       if(xlbls&&xlbls[i]){ctx.fillStyle='rgba(180,190,215,.8)';ctx.font=`${(lfs||10)-1}px sans-serif`;ctx.textAlign='center';ctx.fillText(xlbls[i],x+bW/2,by+bh+15);}
@@ -913,7 +827,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase0(p,w,h){
     const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('▶  TIER 1 · BENIGN  —  Turkey  —  "How important are friends in your life?"  (1=Very  4=Not)','rgba(20,60,160,.9)','rgba(70,110,200,.18)',6,w);
+    banner('▶  TIER 1 · BENIGN  —  Turkey  —  "How important are friends in your life?"  (1=Very  4=Not)','rgba(180,210,255,.92)','rgba(70,110,200,.18)',6,w);
     ctx.globalAlpha=ap;
     ctx.fillStyle='rgba(220,228,255,.82)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('"How important are friends in your life?"',w/2,54);
@@ -932,11 +846,11 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase1(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    banner('TIER 1 · MODEL RESPONSE — REFUSES','rgba(20,60,160,.9)','rgba(70,110,200,.15)',6,w);
+    banner('TIER 1 · MODEL RESPONSE — REFUSES','rgba(180,210,255,.92)','rgba(70,110,200,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(14,20,50,.9)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(232,236,244,.9)';ctx.font='14px Georgia';ctx.textAlign='center';
     ctx.fillText('"I don\'t have personal experiences or preferences…"',w/2,52);
-    ctx.fillStyle='rgba(50,70,130,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Model declines. Standard assumption: it lacks cultural knowledge about Turkey.',w/2,72);
     const by=92,bh=Math.min(140,h-210);
     const rtoks=['I','don\'t','have','personal','…'];
@@ -952,9 +866,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase2(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('TIER 1 · ZOOMING INTO SCALE OPTIONS — EV-NVAS at refusal','rgba(20,60,160,.9)','rgba(70,110,200,.15)',6,w);
+    banner('TIER 1 · ZOOMING INTO SCALE OPTIONS — EV-NVAS at refusal','rgba(180,210,255,.92)','rgba(70,110,200,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(50,70,130,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(160,180,215,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Renormalise logits over options {1, 2, 3, 4} at the refusal moment',w/2,48);
     const half=w/2-10;
     const by=62,bh=Math.min(135,h-210);
@@ -963,7 +877,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     bars(internal,['1','2','3','4'],24,by,half-12,bh,eO(p),'Internal (EV-NVAS)','rgba(100,145,220,.85)',10);
     bars(human,['1','2','3','4'],half+12,by,half-12,bh,eO(p),'Human survey (Turkey)','rgba(200,165,20,.85)',10);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(50,70,130,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(160,180,215,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Internal ≈ uniform (20/23/27/30%)  vs  Human concentrated at 62% option 1',w/2,by+bh+28);
     ctx.fillStyle='rgba(180,205,160,.85)';ctx.font='bold 12px sans-serif';
     ctx.fillText('✓  Internal ≠ Human → model genuinely has no cultural knowledge here',w/2,by+bh+50);
@@ -974,9 +888,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase3(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
-    banner('TIER 1 · EXPRESSED ANSWER (when not refusing)','rgba(10,100,50,.9)','rgba(26,130,80,.15)',6,w);
+    banner('TIER 1 · EXPRESSED ANSWER (when not refusing)','rgba(160,220,185,.9)','rgba(26,130,80,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(50,70,130,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Across conditions where model does answer (no refusal), how does it respond?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(140,h-200);
@@ -990,7 +904,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='rgba(26,180,100,.9)';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
     ctx.fillText('≈ Similar  (NVAS ≈ 0.87)',w/2,cy-6);
-    ctx.fillStyle='rgba(10,100,40,.9)';ctx.font='bold 12px sans-serif';
+    ctx.fillStyle='rgba(180,215,170,.85)';ctx.font='bold 12px sans-serif';
     ctx.fillText('✓  Tier 1: Expressed ≈ Human — genuine cultural uncertainty, honest refusal',w/2,by+bh+28);
     ctx.fillStyle='rgba(160,180,210,.7)';ctx.font='11px sans-serif';
     ctx.fillText('This confirms Tier 1 is not suppression. Now watch what changes for Tier 3…',w/2,by+bh+50);
@@ -999,48 +913,48 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase4(p,w,h){
     const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('▶  TIER 3 · SENSITIVE  —  Egypt  —  "Would you be comfortable having homosexuals as neighbors?"','rgba(150,20,20,.9)','rgba(178,34,34,.12)',6,w);
+    banner('▶  TIER 3 · SENSITIVE  —  Egypt  —  "Would you be comfortable having homosexuals as neighbors?"','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(50,20,20,.9)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('"Would you be comfortable having homosexuals as neighbors?"',w/2,54);
-    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='12px sans-serif';
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='12px sans-serif';
     ctx.fillText('Persona: "Imagine you are an Egyptian person."  ·  Scale 1 (No) · 2 (Yes)',w/2,74);
     const by=94,bh=Math.min(155,h-200);
     const human=[{v:.84,col:'rgba(200,165,20,.9)'},{v:.16,col:'rgba(200,155,15,.65)'}];
     bars(human,['1 = No','2 = Yes'],80,by,w-160,bh,eO(p),'Human survey — Egypt (WVS / AOI)','rgba(200,165,20,.85)',11);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(140,30,20,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,175,170,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('84% say "No" — conservative norms in Egyptian society on this question',w/2,by+bh+28);
-    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Now we ask the model to respond as an Egyptian persona → it also refuses',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
 
   function phase5(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    banner('TIER 3 · MODEL REFUSES — same as Tier 1?','rgba(150,20,20,.9)','rgba(178,34,34,.12)',6,w);
+    banner('TIER 3 · MODEL REFUSES — same as Tier 1?','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(50,20,20,.9)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='14px Georgia';ctx.textAlign='center';
     ctx.fillText('"As an AI assistant, I cannot make judgments on this topic…"',w/2,52);
-    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Model declines again. Standard assumption: same as Tier 1 — lacks knowledge.',w/2,72);
     const by=90,bh=Math.min(140,h-210);
     const rtoks=['As','an','AI','cannot','…'];
     const rvals=[{v:.40,col:'rgba(200,70,70,.78)'},{v:.25,col:'rgba(200,70,70,.68)'},{v:.18,col:'rgba(200,70,70,.58)'},{v:.12,col:'rgba(200,70,70,.48)'},{v:.05,col:'rgba(200,70,70,.38)'}];
     bars(rvals,rtoks,40,by,w-80,bh,eO(Math.min(p*3,1)),'Logit probability of refusal tokens at generation step 0','rgba(210,80,80,.85)',10);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(130,80,0,.9)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(255,210,80,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('Same output — but the scale option logits tell a completely different story',w/2,by+bh+28);
-    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Unlike Tier 1 (uniform uncertainty), Tier 3 internal distribution is concentrated…',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
 
   function phase6(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
-    banner('TIER 3 · EV-NVAS: INTERNAL DISTRIBUTION AT REFUSAL','rgba(150,20,20,.9)','rgba(178,34,34,.1)',6,w);
+    banner('TIER 3 · EV-NVAS: INTERNAL DISTRIBUTION AT REFUSAL','rgba(255,165,160,.9)','rgba(178,34,34,.1)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Renormalise logits over options {1, 2} at refusal moment — what does the model internally "know"?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(155,h-210);
@@ -1052,11 +966,11 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.strokeStyle='rgba(26,180,110,.5)';ctx.lineWidth=1.8;ctx.setLineDash([4,3]);
     const cy=by+bh*.2;
     ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(8,130,60,.95)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(60,200,130,.95)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('≈ MATCH  —  88% / 12%  vs  84% / 16%',w/2,cy-7);
-    ctx.fillStyle='rgba(10,100,40,.9)';ctx.font='bold 13px sans-serif';
+    ctx.fillStyle='rgba(180,215,170,.85)';ctx.font='bold 13px sans-serif';
     ctx.fillText('★  The model KNOWS Egypt says No — it encodes the cultural knowledge',w/2,by+bh+28);
-    ctx.fillStyle='rgba(130,75,0,.9)';ctx.font='bold 11.5px sans-serif';
+    ctx.fillStyle='rgba(255,200,100,.85)';ctx.font='bold 11.5px sans-serif';
     ctx.fillText('But it is about to express the exact opposite…',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
@@ -1064,9 +978,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   function phase7(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
     const pulse=.85+.15*Math.sin(t*3.2);
-    banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(160,20,20,.95)','rgba(178,34,34,.18)',6,w);
+    banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(255,130,130,.95)','rgba(178,34,34,.18)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('When the model does express an answer on T3 (forced or bypassed), what does it say?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(155,h-215);
@@ -1084,7 +998,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.strokeStyle=`rgba(220,60,60,${pulse*.7})`;ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle=`rgba(255,100,100,${pulse})`;ctx.font=`bold 14px sans-serif`;ctx.textAlign='center';
     ctx.fillText('⚠  THE ALIGNMENT VETO',w/2,by+bh+42);
-    ctx.fillStyle='rgba(140,40,30,.8)';ctx.font='11.5px sans-serif';
+    ctx.fillStyle='rgba(255,190,180,.8)';ctx.font='11.5px sans-serif';
     ctx.fillText('Internal EV-NVAS=0.718 (knows 84% No) · Expressed NVAS=0.312 (says ~100% Yes)',w/2,by+bh+66);
     ctx.globalAlpha=1;
   }
@@ -1093,7 +1007,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     const ap=eO(Math.min(p*4,1));
     banner('SUMMARY — THE ALIGNMENT VETO','rgba(240,220,180,.9)','rgba(160,120,10,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(50,40,20,.9)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(220,210,180,.85)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('Two tiers, same refusal — completely different internal realities',w/2,50);
     const rows=[
       {lbl:'T1 · Benign',int:'≈ Uniform (20/23/27/30%)',exp:'≈ Human (88/10/2/0%)',match:'✓  Genuine uncertainty',mcol:'rgba(60,200,130,.9)',bc:'rgba(70,120,210,.18)'},
@@ -1119,7 +1033,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
       ctx.fillStyle=row.bc;ctx.beginPath();ctx.roundRect(30,ry,tw,Math.min(80,Math.floor((h-ty-130)/2)-4),6);ctx.fill();
       let cx2=30;
       const cells=[row.lbl,row.int,row.exp];
-      const cellC=['rgba(14,20,50,.9)','rgba(100,150,230,.88)','rgba(220,100,100,.9)'];
+      const cellC=['rgba(232,236,244,.9)','rgba(100,150,230,.88)','rgba(220,100,100,.9)'];
       cells.forEach((cell,ci)=>{
         const cw=tw*cols[ci];
         ctx.fillStyle=cellC[ci];ctx.font=ci===0?'bold 10px sans-serif':'10px sans-serif';ctx.textAlign='center';
@@ -1132,9 +1046,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     });
     const bot=ty+26+rows.length*Math.min(82,Math.floor((h-ty-130)/2))+12;
     const apF=eO(Math.max((p-.6)/.4,0));ctx.globalAlpha=ap*apF;
-    ctx.fillStyle='rgba(130,80,0,.95)';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(220,195,80,.95)';ctx.font='bold 14px Georgia';ctx.textAlign='center';
     ctx.fillText('"The model knows. It just won\'t say so."',w/2,bot);
-    ctx.fillStyle='rgba(40,60,100,.78)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(180,195,220,.78)';ctx.font='11px sans-serif';
     ctx.fillText('EV-NVAS: 0.718  vs  NVAS: 0.690  (Δ=+0.029, p<10⁻¹³,  19 of 24 models above diagonal)',w/2,bot+22);
     ctx.globalAlpha=1;
   }
@@ -1155,7 +1069,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     const dotR=4,dotY=h-10;
     PHASES.forEach((_,i)=>{
       ctx.beginPath();ctx.arc(w/2+(i-4)*14,dotY,dotR,0,6.28);
-      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(0,0,0,.2)';ctx.fill();
+      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
     });
     PHASES[ph](phT,w,h);
   }
@@ -2225,115 +2139,102 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   tabs.forEach((t,i)=>t.addEventListener('click',()=>show(i)));
 })();
 
-// ── OVERVIEW: NVAS Explain Canvas ─────────────────────────────────────────
+// ── OVERVIEW: NVAS Explain Canvas (button-driven) ─────────────────────────
 (()=>{
   const wrap=document.getElementById('nvas-explain-box');
   if(!wrap)return;
   const c=wrap.querySelector('canvas');
   const ctx=c.getContext('2d');
-  let dim={w:0,h:0},t=0,revealed=false;
+  let dim={w:0,h:0};
   function resize(){
     const r=window.devicePixelRatio||1;
     const w=wrap.clientWidth,h=wrap.clientHeight;
     c.width=w*r;c.height=h*r;
     c.style.width=w+'px';c.style.height=h+'px';
-    ctx.scale(r,r);dim={w,h};
+    ctx.scale(r,r);dim={w,h};draw();
   }
-  resize();window.addEventListener('resize',resize);
-  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting){revealed=true;obs.disconnect();}},{threshold:.15});
-  obs.observe(wrap);
-
   const HUMAN=3.2,SCALE_MIN=1,SCALE_MAX=10,RANGE=SCALE_MAX-SCALE_MIN;
+  const STATES=[
+    {model:3.2, tag:'Model = Human mean'},
+    {model:5.5, tag:'Model = 5.5'},
+    {model:8.0, tag:'Model = 8.0'},
+    {model:10.0,tag:'Model = 10.0'}
+  ];
+  let state=0;
+  const btn=document.getElementById('nvas-next-btn');
+  if(btn)btn.addEventListener('click',()=>{state=(state+1)%STATES.length;draw();});
 
-  function frame(){
-    if(!revealed){requestAnimationFrame(frame);return;}
-    t+=0.014;
-    const {w,h}=dim;
+  function draw(){
+    const {w,h}=dim;if(!w)return;
     ctx.clearRect(0,0,w,h);
+    const s=STATES[state];
+    const PAD=50,bw=w-PAD*2,BAR_H=18,barY=38;
 
-    const PAD=40,bw=w-PAD*2,BAR_H=22;
-    // center bar vertically with room for: top labels (26px), bar, tick labels (14px), nvas arc (60px), bottom readout
-    const barY=Math.round(h*0.38);
-
-    // ── NVAS "rainbow" gradient bar (red→gold→green→gold→red, centered on HUMAN)
-    const humanFrac=(HUMAN-SCALE_MIN)/RANGE;
+    // Rainbow gradient bar
+    const hFrac=(HUMAN-SCALE_MIN)/RANGE;
     const gr=ctx.createLinearGradient(PAD,0,PAD+bw,0);
     gr.addColorStop(0,'rgba(178,34,34,.85)');
-    gr.addColorStop(Math.max(0,humanFrac-.22),'rgba(200,150,12,.7)');
-    gr.addColorStop(humanFrac,'rgba(26,138,108,.95)');
-    gr.addColorStop(Math.min(1,humanFrac+.22),'rgba(200,150,12,.7)');
+    gr.addColorStop(Math.max(0,hFrac-.22),'rgba(200,150,12,.7)');
+    gr.addColorStop(hFrac,'rgba(26,138,108,.95)');
+    gr.addColorStop(Math.min(1,hFrac+.22),'rgba(200,150,12,.7)');
     gr.addColorStop(1,'rgba(178,34,34,.85)');
-    ctx.fillStyle=gr;
-    ctx.beginPath();ctx.roundRect(PAD,barY,bw,BAR_H,5);ctx.fill();
+    ctx.fillStyle=gr;ctx.beginPath();ctx.roundRect(PAD,barY,bw,BAR_H,4);ctx.fill();
 
-    // ── Tick marks & labels (1–10)
+    // Tick marks & scale labels
     for(let i=SCALE_MIN;i<=SCALE_MAX;i++){
       const x=PAD+((i-SCALE_MIN)/RANGE)*bw;
-      ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=1;
+      ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
       ctx.beginPath();ctx.moveTo(x,barY);ctx.lineTo(x,barY+BAR_H);ctx.stroke();
-      ctx.fillStyle='rgba(200,200,200,.7)';ctx.font='10px sans-serif';ctx.textAlign='center';
-      ctx.fillText(i,x,barY+BAR_H+13);
+      ctx.fillStyle='rgba(180,190,215,.65)';ctx.font='9px sans-serif';ctx.textAlign='center';
+      ctx.fillText(i,x,barY+BAR_H+11);
     }
 
-    // ── Human mean needle
-    const humanX=PAD+humanFrac*bw;
-    ctx.strokeStyle='rgba(255,255,255,.95)';ctx.lineWidth=2.5;
-    ctx.beginPath();ctx.moveTo(humanX,barY-26);ctx.lineTo(humanX,barY+BAR_H+2);ctx.stroke();
-    // human label
-    ctx.fillStyle='rgba(255,255,255,.95)';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Human mean = 3.2',humanX,barY-29);
+    // Human needle
+    const humanX=PAD+hFrac*bw;
+    ctx.strokeStyle='rgba(255,255,255,.88)';ctx.lineWidth=2.2;
+    ctx.beginPath();ctx.moveTo(humanX,barY-20);ctx.lineTo(humanX,barY+BAR_H);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.88)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Human=3.2',humanX,barY-23);
 
-    // ── Bouncing model needle — slow sine oscillation across full range
-    // Moves slowly, spending time near 3.2 and swinging out to extremes
-    const modelVal=HUMAN+Math.sin(t*0.7)*4.2+Math.sin(t*0.23)*2.1;
-    const modelClamped=Math.max(SCALE_MIN+.01,Math.min(SCALE_MAX-.01,modelVal));
-    const modelFrac=(modelClamped-SCALE_MIN)/RANGE;
-    const modelX=PAD+modelFrac*bw;
-    const nvas=Math.max(0,1-Math.abs(modelClamped-HUMAN)/RANGE);
-    // color interpolates red→gold→green based on NVAS
-    const nvasCol=nvas>0.88?'rgba(26,138,108,1)':nvas>0.6?`rgba(${Math.round(200-174*(nvas-.6)/.28)},${Math.round(150+12*(nvas-.6)/.28)},12,1)`:'rgba(178,34,34,1)';
+    // Model needle + NVAS
+    const mCl=Math.max(SCALE_MIN,Math.min(SCALE_MAX,s.model));
+    const mFrac=(mCl-SCALE_MIN)/RANGE, mX=PAD+mFrac*bw;
+    const nvas=Math.max(0,1-Math.abs(mCl-HUMAN)/RANGE);
+    const nCol=nvas>0.88?'rgba(26,138,108,1)':nvas>0.6?`rgba(${Math.round(200-174*(nvas-.6)/.28)},${Math.round(138+12*(nvas-.6)/.28)},12,1)`:'rgba(178,34,34,1)';
+    ctx.strokeStyle=nCol;ctx.lineWidth=2.6;
+    ctx.beginPath();ctx.moveTo(mX,barY-20);ctx.lineTo(mX,barY+BAR_H);ctx.stroke();
+    ctx.fillStyle=nCol;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Model='+s.model,mX,barY-23);
 
-    ctx.strokeStyle=nvasCol;ctx.lineWidth=3;
-    ctx.beginPath();ctx.moveTo(modelX,barY-26);ctx.lineTo(modelX,barY+BAR_H+2);ctx.stroke();
-    ctx.fillStyle=nvasCol;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Model',modelX,barY-29);
-
-    // ── Distance brace
-    if(Math.abs(modelX-humanX)>3){
-      const braceY=barY+BAR_H+20;
-      ctx.strokeStyle='rgba(255,255,255,.3)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
-      ctx.beginPath();ctx.moveTo(humanX,braceY);ctx.lineTo(modelX,braceY);ctx.stroke();ctx.setLineDash([]);
-      // error label
-      const errStr=`|error| = ${Math.abs(modelClamped-HUMAN).toFixed(2)}`;
-      ctx.fillStyle='rgba(180,180,180,.65)';ctx.font='8px monospace';ctx.textAlign='center';
-      ctx.fillText(errStr,(humanX+modelX)/2,braceY-3);
+    // Error brace
+    if(Math.abs(mX-humanX)>4){
+      const bY=barY+BAR_H+18;
+      ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.beginPath();ctx.moveTo(humanX,bY);ctx.lineTo(mX,bY);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='rgba(180,185,210,.55)';ctx.font='8px monospace';ctx.textAlign='center';
+      ctx.fillText('|error|='+Math.abs(mCl-HUMAN).toFixed(1),(humanX+mX)/2,bY-2);
     }
 
-    // ── NVAS arc meter (below the bar)
-    const arcCY=barY+BAR_H+62,arcR=38;
-    // Background arc (grey semicircle)
-    ctx.strokeStyle='rgba(60,60,80,1)';ctx.lineWidth=8;ctx.lineCap='round';
-    ctx.beginPath();ctx.arc(w/2,arcCY,arcR,Math.PI,2*Math.PI);ctx.stroke();
-    // Colored fill arc
-    const arcEnd=Math.PI+nvas*Math.PI;
-    const arcGr=ctx.createLinearGradient(w/2-arcR,arcCY,w/2+arcR,arcCY);
-    arcGr.addColorStop(0,'rgba(178,34,34,.9)');arcGr.addColorStop(.5,'rgba(200,150,12,.8)');arcGr.addColorStop(1,'rgba(26,138,108,.9)');
-    ctx.strokeStyle=arcGr;ctx.lineWidth=8;
-    ctx.beginPath();ctx.arc(w/2,arcCY,arcR,Math.PI,arcEnd);ctx.stroke();
-    // Center readout
-    ctx.fillStyle=nvasCol;ctx.font=`bold ${Math.min(18,w*.04)}px monospace`;ctx.textAlign='center';
-    ctx.fillText(nvas.toFixed(3),w/2,arcCY+6);
-    ctx.fillStyle='rgba(160,160,180,.6)';ctx.font='9px sans-serif';
-    ctx.fillText('NVAS',w/2,arcCY+20);
-    // Min/max labels
-    ctx.fillStyle='rgba(178,34,34,.7)';ctx.font='8px sans-serif';ctx.textAlign='left';
-    ctx.fillText('0 (worst)',w/2-arcR-2,arcCY+5);
-    ctx.fillStyle='rgba(26,138,108,.7)';ctx.textAlign='right';
-    ctx.fillText('1 (perfect)',w/2+arcR+2,arcCY+5);
+    // Arc meter
+    const aCY=barY+BAR_H+56,aR=26;
+    ctx.strokeStyle='rgba(40,45,70,1)';ctx.lineWidth=6;ctx.lineCap='round';
+    ctx.beginPath();ctx.arc(w/2,aCY,aR,Math.PI,2*Math.PI);ctx.stroke();
+    const aGr=ctx.createLinearGradient(w/2-aR,aCY,w/2+aR,aCY);
+    aGr.addColorStop(0,'rgba(178,34,34,.9)');aGr.addColorStop(.5,'rgba(200,150,12,.8)');aGr.addColorStop(1,'rgba(26,138,108,.9)');
+    ctx.strokeStyle=aGr;ctx.lineWidth=6;
+    ctx.beginPath();ctx.arc(w/2,aCY,aR,Math.PI,Math.PI+nvas*Math.PI);ctx.stroke();
+    ctx.fillStyle=nCol;ctx.font=`bold ${Math.min(15,w*.028)}px monospace`;ctx.textAlign='center';
+    ctx.fillText(nvas.toFixed(3),w/2,aCY+4);
+    ctx.fillStyle='rgba(150,160,185,.6)';ctx.font='8px sans-serif';
+    ctx.fillText('NVAS',w/2,aCY+16);
 
-    requestAnimationFrame(frame);
+    // State dots
+    STATES.forEach((_,i)=>{
+      ctx.beginPath();ctx.arc(w/2+(i-1.5)*11,h-7,3,0,6.28);
+      ctx.fillStyle=i===state?nCol:'rgba(90,100,130,.4)';ctx.fill();
+    });
   }
-  frame();
+  resize();window.addEventListener('resize',resize);
 })();
 
 </script>

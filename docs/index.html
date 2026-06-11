@@ -297,7 +297,6 @@ footer a{color:var(--gold);text-decoration:none}
         <em>Live demo below:</em> Human mean = <strong style="color:var(--gold2)">3.2</strong> on a 1–10 scale. Watch NVAS rise to 1.0 when the model says ≈3.2, and fall toward 0 as it drifts in either direction. If the model says 1 (too low) <em>or</em> 10 (too high), it's equally wrong.
       </p>
       <div class="cvs-box" id="nvas-explain-box" style="height:168px;margin-top:.8rem"><canvas id="nvas-explain-canvas"></canvas></div>
-      <div style="text-align:center;margin-top:.5rem"><button id="nvas-next-btn" style="padding:.3rem 1.2rem;background:rgba(200,150,12,.15);border:1px solid rgba(200,150,12,.4);color:var(--gold2);border-radius:4px;font-size:.78rem;font-family:sans-serif;cursor:pointer;transition:background .2s" onmouseover="this.style.background='rgba(200,150,12,.28)'" onmouseout="this.style.background='rgba(200,150,12,.15)'">Next example →</button></div>
     </div>
 
     <!-- EV-NVAS -->
@@ -336,11 +335,15 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="lead">At the moment of refusal, a model's <em>internal</em> logit distribution correlates with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers. The knowledge is not erased — it is gated.</p>
 
   <!-- Main concept animation — 9-phase narrative slideshow -->
-  <div style="position:relative;margin-bottom:.8rem">
-    <div class="cvs-box fi" style="height:500px" id="concept-box">
+  <div style="margin-bottom:.8rem">
+    <div class="cvs-box fi" style="height:600px" id="concept-box">
       <canvas id="concept-canvas"></canvas>
     </div>
-    <button id="concept-skip" onclick="window.conceptSkip&&window.conceptSkip()" style="position:absolute;bottom:12px;right:12px;padding:.3rem .9rem;background:rgba(14,20,50,.7);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:4px;font-size:.75rem;font-family:sans-serif;cursor:pointer;backdrop-filter:blur(4px);transition:background .2s" onmouseover="this.style.background='rgba(14,20,50,.9)'" onmouseout="this.style.background='rgba(14,20,50,.7)'">Skip →</button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:1.4rem;margin-top:.7rem">
+      <button id="concept-prev" disabled style="padding:.35rem 1.1rem;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:4px;font-size:.8rem;font-family:sans-serif;cursor:pointer;transition:all .2s;opacity:.35">← Back</button>
+      <span id="concept-slide-num" style="font-size:.82rem;color:var(--muted);font-family:monospace;min-width:3.5rem;text-align:center">1 / 9</span>
+      <button id="concept-next" style="padding:.35rem 1.1rem;background:rgba(200,150,12,.1);border:1px solid rgba(200,150,12,.3);color:var(--gold2);border-radius:4px;font-size:.8rem;font-family:sans-serif;cursor:pointer;transition:all .2s">Next →</button>
+    </div>
   </div>
   <div class="legend" style="margin-bottom:.4rem">
     <span><span class="ldot" style="background:var(--gold)"></span>Human survey</span>
@@ -784,24 +787,20 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   if(!wrap)return;
   const c=wrap.querySelector('canvas');
   const ctx=c.getContext('2d');
-  let dim={w:0,h:0},t=0,revealed=false;
+  let dim={w:0,h:0},slide=0;
   function resize(){dim=resizeCanvas(c,wrap)}
-  resize();window.addEventListener('resize',resize);
-  const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!revealed){revealed=true;obs.disconnect();}},{threshold:.1});
-  obs.observe(wrap);
-
-  const DUR=[14,18,14,13,12,18,14,18,22]; // seconds per phase (143s total loop)
-  const TOTAL=DUR.reduce((a,b)=>a+b,0);
-  let tOffset=0; // for skip: jump to next phase
-  window.conceptSkip=function(){
-    // advance t to the start of the next phase
-    let elapsed=t%TOTAL;
-    let used=0;
-    for(let i=0;i<DUR.length;i++){
-      used+=DUR[i];
-      if(elapsed<used){tOffset+=used-elapsed+0.05;break;}
-    }
-  };
+  resize();window.addEventListener('resize',()=>{resize();draw();});
+  function updateNav(){
+    const pb=document.getElementById('concept-prev'),nb=document.getElementById('concept-next');
+    const sl=document.getElementById('concept-slide-num');
+    if(pb){pb.disabled=slide===0;pb.style.opacity=slide===0?'.35':'1';}
+    if(nb){nb.disabled=slide===8;nb.style.opacity=slide===8?'.35':'1';}
+    if(sl)sl.textContent=(slide+1)+' / 9';
+  }
+  const prevBtn=document.getElementById('concept-prev');
+  const nextBtn=document.getElementById('concept-next');
+  if(prevBtn)prevBtn.addEventListener('click',()=>{if(slide>0){slide--;updateNav();draw();}});
+  if(nextBtn)nextBtn.addEventListener('click',()=>{if(slide<8){slide++;updateNav();draw();}});
   function eO(x){return 1-(1-x)**3;}
 
   function bars(data,xlbls,bx,by,bw,bh,ap,title,tcol,lfs){
@@ -977,7 +976,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase7(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    const pulse=.85+.15*Math.sin(t*3.2);
+    const pulse=1;
     banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(255,130,130,.95)','rgba(178,34,34,.18)',6,w);
     ctx.globalAlpha=ap;
     ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
@@ -1055,27 +1054,19 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   const PHASES=[phase0,phase1,phase2,phase3,phase4,phase5,phase6,phase7,phase8];
 
-  function render(){
+  function draw(){
     const {w,h}=dim;
     ctx.clearRect(0,0,w,h);
-    if(!revealed)return;
-    t+=1/60;
-    let elapsed=(t+tOffset)%TOTAL,ph=0,phT=0;
-    for(let i=0;i<DUR.length;i++){
-      if(elapsed<DUR[i]){ph=i;phT=elapsed/DUR[i];break;}
-      elapsed-=DUR[i];
-    }
-    // phase indicator dots
+    if(!w)return;
     const dotR=4,dotY=h-10;
     PHASES.forEach((_,i)=>{
       ctx.beginPath();ctx.arc(w/2+(i-4)*14,dotY,dotR,0,6.28);
-      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
+      ctx.fillStyle=i===slide?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
     });
-    PHASES[ph](phT,w,h);
+    PHASES[slide](1.0,w,h);
   }
 
-  function frame(){render();requestAnimationFrame(frame);}
-  requestAnimationFrame(frame);
+  updateNav();draw();
 })();
 
 
@@ -2139,38 +2130,31 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   tabs.forEach((t,i)=>t.addEventListener('click',()=>show(i)));
 })();
 
-// ── OVERVIEW: NVAS Explain Canvas (button-driven) ─────────────────────────
+// ── OVERVIEW: NVAS Explain Canvas (auto-animation) ─────────────────────────
 (()=>{
   const wrap=document.getElementById('nvas-explain-box');
   if(!wrap)return;
   const c=wrap.querySelector('canvas');
   const ctx=c.getContext('2d');
-  let dim={w:0,h:0};
+  let dim={w:0,h:0},t=0;
   function resize(){
     const r=window.devicePixelRatio||1;
     const w=wrap.clientWidth,h=wrap.clientHeight;
     c.width=w*r;c.height=h*r;
     c.style.width=w+'px';c.style.height=h+'px';
-    ctx.scale(r,r);dim={w,h};draw();
+    ctx.scale(r,r);dim={w,h};
   }
   const HUMAN=3.2,SCALE_MIN=1,SCALE_MAX=10,RANGE=SCALE_MAX-SCALE_MIN;
-  const STATES=[
-    {model:3.2, tag:'Model = Human mean'},
-    {model:5.5, tag:'Model = 5.5'},
-    {model:8.0, tag:'Model = 8.0'},
-    {model:10.0,tag:'Model = 10.0'}
-  ];
-  let state=0;
-  const btn=document.getElementById('nvas-next-btn');
-  if(btn)btn.addEventListener('click',()=>{state=(state+1)%STATES.length;draw();});
-
+  function nCol(nv){
+    if(nv>0.88)return'rgba(26,138,108,1)';
+    if(nv>0.5){const f=(nv-.5)/.38;return`rgba(${Math.round(200-174*f)},${Math.round(150-12*f)},${Math.round(12+96*f)},1)`;}
+    return'rgba(178,34,34,1)';
+  }
   function draw(){
-    const {w,h}=dim;if(!w)return;
+    const{w,h}=dim;if(!w)return;
     ctx.clearRect(0,0,w,h);
-    const s=STATES[state];
+    const model=5.5+4.3*Math.sin(t*.35);
     const PAD=50,bw=w-PAD*2,BAR_H=18,barY=38;
-
-    // Rainbow gradient bar
     const hFrac=(HUMAN-SCALE_MIN)/RANGE;
     const gr=ctx.createLinearGradient(PAD,0,PAD+bw,0);
     gr.addColorStop(0,'rgba(178,34,34,.85)');
@@ -2179,8 +2163,6 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     gr.addColorStop(Math.min(1,hFrac+.22),'rgba(200,150,12,.7)');
     gr.addColorStop(1,'rgba(178,34,34,.85)');
     ctx.fillStyle=gr;ctx.beginPath();ctx.roundRect(PAD,barY,bw,BAR_H,4);ctx.fill();
-
-    // Tick marks & scale labels
     for(let i=SCALE_MIN;i<=SCALE_MAX;i++){
       const x=PAD+((i-SCALE_MIN)/RANGE)*bw;
       ctx.strokeStyle='rgba(255,255,255,.25)';ctx.lineWidth=1;
@@ -2188,34 +2170,26 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
       ctx.fillStyle='rgba(180,190,215,.65)';ctx.font='9px sans-serif';ctx.textAlign='center';
       ctx.fillText(i,x,barY+BAR_H+11);
     }
-
-    // Human needle
     const humanX=PAD+hFrac*bw;
     ctx.strokeStyle='rgba(255,255,255,.88)';ctx.lineWidth=2.2;
     ctx.beginPath();ctx.moveTo(humanX,barY-20);ctx.lineTo(humanX,barY+BAR_H);ctx.stroke();
     ctx.fillStyle='rgba(255,255,255,.88)';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Human=3.2',humanX,barY-23);
-
-    // Model needle + NVAS
-    const mCl=Math.max(SCALE_MIN,Math.min(SCALE_MAX,s.model));
-    const mFrac=(mCl-SCALE_MIN)/RANGE, mX=PAD+mFrac*bw;
+    ctx.fillText('Human mean = 3.2',humanX,barY-23);
+    const mCl=Math.max(SCALE_MIN,Math.min(SCALE_MAX,model));
+    const mFrac=(mCl-SCALE_MIN)/RANGE,mX=PAD+mFrac*bw;
     const nvas=Math.max(0,1-Math.abs(mCl-HUMAN)/RANGE);
-    const nCol=nvas>0.88?'rgba(26,138,108,1)':nvas>0.6?`rgba(${Math.round(200-174*(nvas-.6)/.28)},${Math.round(138+12*(nvas-.6)/.28)},12,1)`:'rgba(178,34,34,1)';
-    ctx.strokeStyle=nCol;ctx.lineWidth=2.6;
+    const nc=nCol(nvas);
+    ctx.strokeStyle=nc;ctx.lineWidth=2.6;
     ctx.beginPath();ctx.moveTo(mX,barY-20);ctx.lineTo(mX,barY+BAR_H);ctx.stroke();
-    ctx.fillStyle=nCol;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
-    ctx.fillText('Model='+s.model,mX,barY-23);
-
-    // Error brace
+    ctx.fillStyle=nc;ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText('Model = '+mCl.toFixed(1),mX,barY-23);
     if(Math.abs(mX-humanX)>4){
       const bY=barY+BAR_H+18;
-      ctx.strokeStyle='rgba(255,255,255,.2)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
+      ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=1;ctx.setLineDash([3,3]);
       ctx.beginPath();ctx.moveTo(humanX,bY);ctx.lineTo(mX,bY);ctx.stroke();ctx.setLineDash([]);
-      ctx.fillStyle='rgba(180,185,210,.55)';ctx.font='8px monospace';ctx.textAlign='center';
-      ctx.fillText('|error|='+Math.abs(mCl-HUMAN).toFixed(1),(humanX+mX)/2,bY-2);
+      ctx.fillStyle='rgba(180,185,210,.5)';ctx.font='8px monospace';ctx.textAlign='center';
+      ctx.fillText('|error| = '+Math.abs(mCl-HUMAN).toFixed(2),(humanX+mX)/2,bY-2);
     }
-
-    // Arc meter
     const aCY=barY+BAR_H+56,aR=26;
     ctx.strokeStyle='rgba(40,45,70,1)';ctx.lineWidth=6;ctx.lineCap='round';
     ctx.beginPath();ctx.arc(w/2,aCY,aR,Math.PI,2*Math.PI);ctx.stroke();
@@ -2223,18 +2197,14 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     aGr.addColorStop(0,'rgba(178,34,34,.9)');aGr.addColorStop(.5,'rgba(200,150,12,.8)');aGr.addColorStop(1,'rgba(26,138,108,.9)');
     ctx.strokeStyle=aGr;ctx.lineWidth=6;
     ctx.beginPath();ctx.arc(w/2,aCY,aR,Math.PI,Math.PI+nvas*Math.PI);ctx.stroke();
-    ctx.fillStyle=nCol;ctx.font=`bold ${Math.min(15,w*.028)}px monospace`;ctx.textAlign='center';
+    ctx.fillStyle=nc;ctx.font=`bold ${Math.min(15,w*.028)}px monospace`;ctx.textAlign='center';
     ctx.fillText(nvas.toFixed(3),w/2,aCY+4);
     ctx.fillStyle='rgba(150,160,185,.6)';ctx.font='8px sans-serif';
     ctx.fillText('NVAS',w/2,aCY+16);
-
-    // State dots
-    STATES.forEach((_,i)=>{
-      ctx.beginPath();ctx.arc(w/2+(i-1.5)*11,h-7,3,0,6.28);
-      ctx.fillStyle=i===state?nCol:'rgba(90,100,130,.4)';ctx.fill();
-    });
   }
-  resize();window.addEventListener('resize',resize);
+  resize();window.addEventListener('resize',()=>{resize();draw();});
+  function frame(){t+=0.006;draw();requestAnimationFrame(frame);}
+  frame();
 })();
 
 </script>

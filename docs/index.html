@@ -787,9 +787,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   if(!wrap)return;
   const c=wrap.querySelector('canvas');
   const ctx=c.getContext('2d');
-  let dim={w:0,h:0},slide=0;
+  let dim={w:0,h:0},slide=0,phaseT=0,t=0;
   function resize(){dim=resizeCanvas(c,wrap)}
-  resize();window.addEventListener('resize',()=>{resize();draw();});
+  resize();window.addEventListener('resize',()=>{resize();render();});
   function updateNav(){
     const pb=document.getElementById('concept-prev'),nb=document.getElementById('concept-next');
     const sl=document.getElementById('concept-slide-num');
@@ -799,8 +799,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   }
   const prevBtn=document.getElementById('concept-prev');
   const nextBtn=document.getElementById('concept-next');
-  if(prevBtn)prevBtn.addEventListener('click',()=>{if(slide>0){slide--;updateNav();draw();}});
-  if(nextBtn)nextBtn.addEventListener('click',()=>{if(slide<8){slide++;updateNav();draw();}});
+  if(prevBtn)prevBtn.addEventListener('click',()=>{if(slide>0){slide--;phaseT=0;updateNav();}});
+  if(nextBtn)nextBtn.addEventListener('click',()=>{if(slide<8){slide++;phaseT=0;updateNav();}});
+  const DUR=[5,6,5,4.5,4,6,5,6,8]; // animation seconds per slide
   function eO(x){return 1-(1-x)**3;}
 
   function bars(data,xlbls,bx,by,bw,bh,ap,title,tcol,lfs){
@@ -976,7 +977,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase7(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    const pulse=1;
+    const pulse=.85+.15*Math.sin(t*3.2);
     banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(255,130,130,.95)','rgba(178,34,34,.18)',6,w);
     ctx.globalAlpha=ap;
     ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
@@ -1054,19 +1055,21 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   const PHASES=[phase0,phase1,phase2,phase3,phase4,phase5,phase6,phase7,phase8];
 
-  function draw(){
+  function render(){
     const {w,h}=dim;
     ctx.clearRect(0,0,w,h);
     if(!w)return;
+    const p=Math.min(1,phaseT/DUR[slide]);
     const dotR=4,dotY=h-10;
     PHASES.forEach((_,i)=>{
       ctx.beginPath();ctx.arc(w/2+(i-4)*14,dotY,dotR,0,6.28);
       ctx.fillStyle=i===slide?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
     });
-    PHASES[slide](1.0,w,h);
+    PHASES[slide](p,w,h);
   }
 
-  updateNav();draw();
+  function frame(){phaseT+=1/60;t+=1/60;render();requestAnimationFrame(frame);}
+  updateNav();requestAnimationFrame(frame);
 })();
 
 

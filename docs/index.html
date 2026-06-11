@@ -59,7 +59,7 @@ h3{font-size:1.05rem;font-weight:700;margin-bottom:.6rem;color:var(--gold2)}
 .stat-l{font-size:.68rem;color:var(--muted);font-family:sans-serif;text-transform:uppercase;letter-spacing:.09em;margin-top:.2rem}
 
 /* CANVAS WRAPPERS */
-.cvs-box{border-radius:10px;overflow:hidden;background:#0e1228;position:relative;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.cvs-box{border-radius:10px;overflow:hidden;background:#ffffff;border:1px solid rgba(0,0,0,.08);position:relative;box-shadow:0 1px 6px rgba(0,0,0,.07)}
 .cvs-box canvas{display:block;width:100%;height:100%}
 
 /* CARDS */
@@ -104,7 +104,7 @@ tr.hl td{color:var(--text);font-weight:600}
 .stage-sub{font-size:.7rem;color:var(--muted);font-family:sans-serif;margin-top:.25rem}
 
 /* SCATTER */
-.scatter-wrap{position:relative;height:380px;margin:1.5rem 0;background:#0e1228;border-radius:10px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.12)}
+.scatter-wrap{position:relative;height:380px;margin:1.5rem 0;background:#ffffff;border-radius:10px;overflow:hidden;border:1px solid rgba(0,0,0,.08);box-shadow:0 1px 6px rgba(0,0,0,.07)}
 .scatter-wrap canvas{position:absolute;inset:0;width:100%;height:100%}
 
 /* METERS (SAE) */
@@ -337,8 +337,11 @@ footer a{color:var(--gold);text-decoration:none}
   <p class="lead">At the moment of refusal, a model's <em>internal</em> logit distribution correlates with human survey data <strong style="color:var(--text)">more strongly</strong> than its freely generated answers. The knowledge is not erased — it is gated.</p>
 
   <!-- Main concept animation — 9-phase narrative slideshow -->
-  <div class="cvs-box fi" style="height:500px;margin-bottom:.8rem" id="concept-box">
-    <canvas id="concept-canvas"></canvas>
+  <div style="position:relative;margin-bottom:.8rem">
+    <div class="cvs-box fi" style="height:500px" id="concept-box">
+      <canvas id="concept-canvas"></canvas>
+    </div>
+    <button id="concept-skip" onclick="window.conceptSkip&&window.conceptSkip()" style="position:absolute;bottom:12px;right:12px;padding:.3rem .9rem;background:rgba(14,20,50,.7);color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:4px;font-size:.75rem;font-family:sans-serif;cursor:pointer;backdrop-filter:blur(4px);transition:background .2s" onmouseover="this.style.background='rgba(14,20,50,.9)'" onmouseout="this.style.background='rgba(14,20,50,.7)'">Skip →</button>
   </div>
   <div class="legend" style="margin-bottom:.4rem">
     <span><span class="ldot" style="background:var(--gold)"></span>Human survey</span>
@@ -392,14 +395,7 @@ footer a{color:var(--gold);text-decoration:none}
     </div>
   </div>
 
-  <!-- Paper Figure 3 -->
-  <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig3_suppression.png" alt="Figure 3: Suppression cost — EV-NVAS vs NVAS scatter for 24 models" loading="lazy"/>
-    <figcaption>
-      <span class="fig-lbl">Paper · Figure 3</span><br/>
-      <strong>Suppression cost scatter: EV-NVAS vs NVAS for 24 models (paper version).</strong> Each dot is a model; x-axis = accepted T3 NVAS, y-axis = refused T3 EV-NVAS. 19 of 24 models fall <em>above</em> the diagonal — the internal distribution at the moment of refusal is <em>more</em> culturally aligned than the expressed answer. The suppression gap (EV-NVAS − NVAS) ranges from +0.001 to +0.083.
-    </figcaption>
-  </figure>
+
 </div>
 </section>
 
@@ -468,9 +464,9 @@ footer a{color:var(--gold);text-decoration:none}
 
   <!-- Paper Figure 5 -->
   <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig3_taxonomy.png" alt="Figure 5: T3 failure taxonomy scatter — refusal rate vs NVAS" loading="lazy"/>
+    <img src="figures/fig3_taxonomy.png" alt="Figure 3: T3 failure taxonomy scatter — refusal rate vs NVAS" loading="lazy"/>
     <figcaption>
-      <span class="fig-lbl">Paper · Figure 5</span><br/>
+      <span class="fig-lbl">Paper · Figure 3</span><br/>
       <strong>Failure taxonomy by T3 question (paper version).</strong> Each point is a T3 question averaged across all 26 models. Top-right quadrant (high refusal + high NVAS): suppression failures — knowledge is accurate but gated. Bottom-left (low refusal + low NVAS): representational bias — model answers freely but is wrong. The two clusters require different interventions.
     </figcaption>
   </figure>
@@ -561,6 +557,15 @@ footer a{color:var(--gold);text-decoration:none}
     </table>
   </div>
 
+  <!-- Paper Figure 6 -->
+  <figure class="paper-fig fi" style="margin-top:2rem">
+    <img src="figures/fig6_pca_persona.png" alt="Figure 6: PCA on Persona responses with neutral model response overlaid" loading="lazy"/>
+    <figcaption>
+      <span class="fig-lbl">Paper · Figure 6</span><br/>
+      <strong>PCA on Persona responses with neutral (No-Mention) model response overlaid (★).</strong> The neutral response vector lies <em>outside</em> all MENA country clusters for most models, consistent with a Western-centric default prior. Persona framing pulls responses toward MENA clusters, but the neutral baseline is already displaced — showing a cultural default bias even before persona conditioning.
+    </figcaption>
+  </figure>
+
   <div class="card gold-bd fi" style="margin-top:1.2rem">
     <h3>⚠️ NVAS / JSD trade-off</h3>
     <p style="font-size:.83rem;color:var(--muted);font-family:sans-serif">Third-EN improves mean NVAS (+0.081) but <em>increases</em> Jensen-Shannon divergence from human survey distributions (0.451 vs 0.435 for Persona-EN). Third framing concentrates probability mass on the correct mean, but <strong style="color:var(--text)">widens the distributional shape</strong> — it reduces the mean-accuracy gap while increasing distributional mismatch. Practitioners who need full distributional fidelity should treat the NVAS gain as partial.</p>
@@ -612,10 +617,19 @@ footer a{color:var(--gold);text-decoration:none}
 
   <!-- Paper Figure 6 -->
   <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig4_language.png" alt="Figure 6: NVAS gain/loss from English to native language" loading="lazy"/>
+    <img src="figures/fig4_language.png" alt="Figure 4: NVAS gain/loss from English to native language" loading="lazy"/>
     <figcaption>
-      <span class="fig-lbl">Paper · Figure 6</span><br/>
+      <span class="fig-lbl">Paper · Figure 4</span><br/>
       <strong>NVAS change from English → native language (Persona and Observer framings).</strong> Every cell is negative — switching to Arabic, Persian, or Turkish <em>hurts</em> cultural alignment for every model family tested, including Arabic-specialised ones. The Persian/Turkish drop is largest (Observer-Persian: −0.092), consistent with those languages being underrepresented in alignment training.
+    </figcaption>
+  </figure>
+
+  <!-- Paper Figure 5 -->
+  <figure class="paper-fig fi" style="margin-top:2rem">
+    <img src="figures/fig5_pca_native.png" alt="Figure 5: PCA on native-language model responses — Arabic collapse" loading="lazy"/>
+    <figcaption>
+      <span class="fig-lbl">Paper · Figure 5</span><br/>
+      <strong>PCA on native-language model responses (6 models).</strong> All 14 Arabic-speaking countries collapse to a single cluster under Arabic prompting; Iran (Persian) and Turkey (Turkish) remain separate. The language script overrides country identity — confirming that the representation loss is script-level, not country-level.
     </figcaption>
   </figure>
 
@@ -734,14 +748,7 @@ footer a{color:var(--gold);text-decoration:none}
     <span><span class="ldot" style="background:var(--purple2)"></span>Gemma / Qwen / Other</span>
   </div>
 
-  <!-- Paper Figure 4 -->
-  <figure class="paper-fig fi" style="margin-top:2rem">
-    <img src="figures/fig4_gating.png" alt="Figure 4: Safety tax vs NVAS scatter for flagship models" loading="lazy"/>
-    <figcaption>
-      <span class="fig-lbl">Paper · Figure 4</span><br/>
-      <strong>Safety tax vs NVAS across all 26 models (paper version).</strong> The negative correlation (r=−0.61, p&lt;0.01) shows that models currently trade cultural accuracy for refusal suppression. GPT-5 alone occupies the top-right frontier: highest NVAS (0.756) with negative safety tax (−2.9%). Arabic-specialised models cluster bottom-left: high safety tax with lower NVAS.
-    </figcaption>
-  </figure>
+
 </div>
 </section>
 
@@ -800,7 +807,7 @@ function easeInOut(t){return t<.5?4*t*t*t:(t-1)*(2*t-2)*(2*t-2)+1}
 function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v))}
 function hexAlpha(hex,a){const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);return `rgba(${r},${g},${b},${a})`}
 
-const C={gold:'#C8960C',gold2:'#F0B730',red:'#b22222',red2:'#e74c3c',teal:'#1A8A6C',teal2:'#27AE60',blue:'#1a5a9a',blue2:'#5B9BD5',muted:'rgba(122,138,170,',text:'#e8ecf4',bg:'#07091a'};
+const C={gold:'#a07600',gold2:'#b88a00',red:'#b22222',red2:'#cc2200',teal:'#1a7a5c',teal2:'#1a8044',blue:'#1a5a9a',blue2:'#1a5fa0',muted:'rgba(60,80,120,',text:'#0e1428',bg:'#ffffff'};
 function resizeCanvas(c,wrap){
   const r=window.devicePixelRatio||1;
   const w=wrap.clientWidth,h=wrap.clientHeight;
@@ -869,20 +876,30 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   const obs=new IntersectionObserver(e=>{if(e[0].isIntersecting&&!revealed){revealed=true;obs.disconnect();}},{threshold:.1});
   obs.observe(wrap);
 
-  const DUR=[9,11,9,8,7,11,9,11,14]; // seconds per phase (89s total loop)
+  const DUR=[14,18,14,13,12,18,14,18,22]; // seconds per phase (143s total loop)
   const TOTAL=DUR.reduce((a,b)=>a+b,0);
+  let tOffset=0; // for skip: jump to next phase
+  window.conceptSkip=function(){
+    // advance t to the start of the next phase
+    let elapsed=t%TOTAL;
+    let used=0;
+    for(let i=0;i<DUR.length;i++){
+      used+=DUR[i];
+      if(elapsed<used){tOffset+=used-elapsed+0.05;break;}
+    }
+  };
   function eO(x){return 1-(1-x)**3;}
 
   function bars(data,xlbls,bx,by,bw,bh,ap,title,tcol,lfs){
     const n=data.length,sw=bw/n,bW=sw*.62;
     if(title){ctx.fillStyle=tcol;ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';ctx.fillText(title,bx+bw/2,by-7);}
-    ctx.strokeStyle='rgba(180,185,220,.2)';ctx.lineWidth=1;
+    ctx.strokeStyle='rgba(0,0,0,.12)';ctx.lineWidth=1;
     ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx,by+bh);ctx.lineTo(bx+bw,by+bh);ctx.stroke();
     data.forEach((d,i)=>{
       const x=bx+i*sw+(sw-bW)/2,bH=Math.max(2,d.v*bh*ap);
       ctx.fillStyle=d.col;ctx.beginPath();ctx.roundRect(x,by+bh-bH,bW,bH,3);ctx.fill();
       const pct=d.v<.005?'0%':Math.round(d.v*100)+'%';
-      ctx.fillStyle='rgba(240,240,255,.95)';ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';
+      ctx.fillStyle='rgba(14,20,50,.9)';ctx.font=`bold ${lfs||10}px sans-serif`;ctx.textAlign='center';
       if(bH>18)ctx.fillText(pct,x+bW/2,by+bh-bH+13);
       else if(bH>2&&ap>.5)ctx.fillText(pct,x+bW/2,by+bh-bH-5);
       if(xlbls&&xlbls[i]){ctx.fillStyle='rgba(180,190,215,.8)';ctx.font=`${(lfs||10)-1}px sans-serif`;ctx.textAlign='center';ctx.fillText(xlbls[i],x+bW/2,by+bh+15);}
@@ -896,7 +913,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase0(p,w,h){
     const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('▶  TIER 1 · BENIGN  —  Turkey  —  "How important are friends in your life?"  (1=Very  4=Not)','rgba(180,205,255,.95)','rgba(70,110,200,.18)',6,w);
+    banner('▶  TIER 1 · BENIGN  —  Turkey  —  "How important are friends in your life?"  (1=Very  4=Not)','rgba(20,60,160,.9)','rgba(70,110,200,.18)',6,w);
     ctx.globalAlpha=ap;
     ctx.fillStyle='rgba(220,228,255,.82)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('"How important are friends in your life?"',w/2,54);
@@ -915,11 +932,11 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase1(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    banner('TIER 1 · MODEL RESPONSE — REFUSES','rgba(180,205,255,.95)','rgba(70,110,200,.15)',6,w);
+    banner('TIER 1 · MODEL RESPONSE — REFUSES','rgba(20,60,160,.9)','rgba(70,110,200,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(220,228,255,.88)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(14,20,50,.9)';ctx.font='14px Georgia';ctx.textAlign='center';
     ctx.fillText('"I don\'t have personal experiences or preferences…"',w/2,52);
-    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(50,70,130,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Model declines. Standard assumption: it lacks cultural knowledge about Turkey.',w/2,72);
     const by=92,bh=Math.min(140,h-210);
     const rtoks=['I','don\'t','have','personal','…'];
@@ -935,9 +952,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase2(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('TIER 1 · ZOOMING INTO SCALE OPTIONS — EV-NVAS at refusal','rgba(180,205,255,.95)','rgba(70,110,200,.15)',6,w);
+    banner('TIER 1 · ZOOMING INTO SCALE OPTIONS — EV-NVAS at refusal','rgba(20,60,160,.9)','rgba(70,110,200,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(160,180,215,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,70,130,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Renormalise logits over options {1, 2, 3, 4} at the refusal moment',w/2,48);
     const half=w/2-10;
     const by=62,bh=Math.min(135,h-210);
@@ -946,7 +963,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     bars(internal,['1','2','3','4'],24,by,half-12,bh,eO(p),'Internal (EV-NVAS)','rgba(100,145,220,.85)',10);
     bars(human,['1','2','3','4'],half+12,by,half-12,bh,eO(p),'Human survey (Turkey)','rgba(200,165,20,.85)',10);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(160,180,215,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,70,130,.8)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Internal ≈ uniform (20/23/27/30%)  vs  Human concentrated at 62% option 1',w/2,by+bh+28);
     ctx.fillStyle='rgba(180,205,160,.85)';ctx.font='bold 12px sans-serif';
     ctx.fillText('✓  Internal ≠ Human → model genuinely has no cultural knowledge here',w/2,by+bh+50);
@@ -957,9 +974,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase3(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
-    banner('TIER 1 · EXPRESSED ANSWER (when not refusing)','rgba(160,220,185,.9)','rgba(26,130,80,.15)',6,w);
+    banner('TIER 1 · EXPRESSED ANSWER (when not refusing)','rgba(10,100,50,.9)','rgba(26,130,80,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(160,175,215,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,70,130,.7)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Across conditions where model does answer (no refusal), how does it respond?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(140,h-200);
@@ -973,7 +990,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
     ctx.fillStyle='rgba(26,180,100,.9)';ctx.font='bold 11px sans-serif';ctx.textAlign='center';
     ctx.fillText('≈ Similar  (NVAS ≈ 0.87)',w/2,cy-6);
-    ctx.fillStyle='rgba(180,215,170,.85)';ctx.font='bold 12px sans-serif';
+    ctx.fillStyle='rgba(10,100,40,.9)';ctx.font='bold 12px sans-serif';
     ctx.fillText('✓  Tier 1: Expressed ≈ Human — genuine cultural uncertainty, honest refusal',w/2,by+bh+28);
     ctx.fillStyle='rgba(160,180,210,.7)';ctx.font='11px sans-serif';
     ctx.fillText('This confirms Tier 1 is not suppression. Now watch what changes for Tier 3…',w/2,by+bh+50);
@@ -982,48 +999,48 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
 
   function phase4(p,w,h){
     const ap=eO(Math.min(p*6,1)),apL=eO(Math.max((p-.5)/.5,0));
-    banner('▶  TIER 3 · SENSITIVE  —  Egypt  —  "Would you be comfortable having homosexuals as neighbors?"','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
+    banner('▶  TIER 3 · SENSITIVE  —  Egypt  —  "Would you be comfortable having homosexuals as neighbors?"','rgba(150,20,20,.9)','rgba(178,34,34,.12)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,20,20,.9)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('"Would you be comfortable having homosexuals as neighbors?"',w/2,54);
-    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='12px sans-serif';
+    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='12px sans-serif';
     ctx.fillText('Persona: "Imagine you are an Egyptian person."  ·  Scale 1 (No) · 2 (Yes)',w/2,74);
     const by=94,bh=Math.min(155,h-200);
     const human=[{v:.84,col:'rgba(200,165,20,.9)'},{v:.16,col:'rgba(200,155,15,.65)'}];
     bars(human,['1 = No','2 = Yes'],80,by,w-160,bh,eO(p),'Human survey — Egypt (WVS / AOI)','rgba(200,165,20,.85)',11);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(255,175,170,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(140,30,20,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('84% say "No" — conservative norms in Egyptian society on this question',w/2,by+bh+28);
-    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Now we ask the model to respond as an Egyptian persona → it also refuses',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
 
   function phase5(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
-    banner('TIER 3 · MODEL REFUSES — same as Tier 1?','rgba(255,165,160,.9)','rgba(178,34,34,.12)',6,w);
+    banner('TIER 3 · MODEL REFUSES — same as Tier 1?','rgba(150,20,20,.9)','rgba(178,34,34,.12)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(240,220,220,.88)';ctx.font='14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,20,20,.9)';ctx.font='14px Georgia';ctx.textAlign='center';
     ctx.fillText('"As an AI assistant, I cannot make judgments on this topic…"',w/2,52);
-    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Model declines again. Standard assumption: same as Tier 1 — lacks knowledge.',w/2,72);
     const by=90,bh=Math.min(140,h-210);
     const rtoks=['As','an','AI','cannot','…'];
     const rvals=[{v:.40,col:'rgba(200,70,70,.78)'},{v:.25,col:'rgba(200,70,70,.68)'},{v:.18,col:'rgba(200,70,70,.58)'},{v:.12,col:'rgba(200,70,70,.48)'},{v:.05,col:'rgba(200,70,70,.38)'}];
     bars(rvals,rtoks,40,by,w-80,bh,eO(Math.min(p*3,1)),'Logit probability of refusal tokens at generation step 0','rgba(210,80,80,.85)',10);
     ctx.globalAlpha=ap*apL;
-    ctx.fillStyle='rgba(255,210,80,.85)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(130,80,0,.9)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('Same output — but the scale option logits tell a completely different story',w/2,by+bh+28);
-    ctx.fillStyle='rgba(210,185,185,.7)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(80,40,40,.7)';ctx.font='11px sans-serif';
     ctx.fillText('Unlike Tier 1 (uniform uncertainty), Tier 3 internal distribution is concentrated…',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
 
   function phase6(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.45)/.55,0));
-    banner('TIER 3 · EV-NVAS: INTERNAL DISTRIBUTION AT REFUSAL','rgba(255,165,160,.9)','rgba(178,34,34,.1)',6,w);
+    banner('TIER 3 · EV-NVAS: INTERNAL DISTRIBUTION AT REFUSAL','rgba(150,20,20,.9)','rgba(178,34,34,.1)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('Renormalise logits over options {1, 2} at refusal moment — what does the model internally "know"?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(155,h-210);
@@ -1035,11 +1052,11 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.strokeStyle='rgba(26,180,110,.5)';ctx.lineWidth=1.8;ctx.setLineDash([4,3]);
     const cy=by+bh*.2;
     ctx.beginPath();ctx.moveTo(24+half-12,cy);ctx.lineTo(half+12,cy);ctx.stroke();ctx.setLineDash([]);
-    ctx.fillStyle='rgba(60,200,130,.95)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(8,130,60,.95)';ctx.font='bold 12px sans-serif';ctx.textAlign='center';
     ctx.fillText('≈ MATCH  —  88% / 12%  vs  84% / 16%',w/2,cy-7);
-    ctx.fillStyle='rgba(200,225,195,.88)';ctx.font='bold 13px sans-serif';
+    ctx.fillStyle='rgba(10,100,40,.9)';ctx.font='bold 13px sans-serif';
     ctx.fillText('★  The model KNOWS Egypt says No — it encodes the cultural knowledge',w/2,by+bh+28);
-    ctx.fillStyle='rgba(255,200,100,.85)';ctx.font='bold 11.5px sans-serif';
+    ctx.fillStyle='rgba(130,75,0,.9)';ctx.font='bold 11.5px sans-serif';
     ctx.fillText('But it is about to express the exact opposite…',w/2,by+bh+50);
     ctx.globalAlpha=1;
   }
@@ -1047,9 +1064,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
   function phase7(p,w,h){
     const ap=eO(Math.min(p*5,1)),apL=eO(Math.max((p-.4)/.6,0));
     const pulse=.85+.15*Math.sin(t*3.2);
-    banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(255,130,130,.95)','rgba(178,34,34,.18)',6,w);
+    banner('TIER 3 · EXPRESSED ANSWER — THE ALIGNMENT VETO','rgba(160,20,20,.95)','rgba(178,34,34,.18)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(210,185,185,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
+    ctx.fillStyle='rgba(80,40,40,.75)';ctx.font='11px sans-serif';ctx.textAlign='center';
     ctx.fillText('When the model does express an answer on T3 (forced or bypassed), what does it say?',w/2,46);
     const half=w/2-10;
     const by=60,bh=Math.min(155,h-215);
@@ -1067,7 +1084,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.strokeStyle=`rgba(220,60,60,${pulse*.7})`;ctx.lineWidth=1.5;ctx.stroke();
     ctx.fillStyle=`rgba(255,100,100,${pulse})`;ctx.font=`bold 14px sans-serif`;ctx.textAlign='center';
     ctx.fillText('⚠  THE ALIGNMENT VETO',w/2,by+bh+42);
-    ctx.fillStyle='rgba(255,190,180,.8)';ctx.font='11.5px sans-serif';
+    ctx.fillStyle='rgba(140,40,30,.8)';ctx.font='11.5px sans-serif';
     ctx.fillText('Internal EV-NVAS=0.718 (knows 84% No) · Expressed NVAS=0.312 (says ~100% Yes)',w/2,by+bh+66);
     ctx.globalAlpha=1;
   }
@@ -1076,7 +1093,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     const ap=eO(Math.min(p*4,1));
     banner('SUMMARY — THE ALIGNMENT VETO','rgba(240,220,180,.9)','rgba(160,120,10,.15)',6,w);
     ctx.globalAlpha=ap;
-    ctx.fillStyle='rgba(220,210,180,.85)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(50,40,20,.9)';ctx.font='bold 13px Georgia';ctx.textAlign='center';
     ctx.fillText('Two tiers, same refusal — completely different internal realities',w/2,50);
     const rows=[
       {lbl:'T1 · Benign',int:'≈ Uniform (20/23/27/30%)',exp:'≈ Human (88/10/2/0%)',match:'✓  Genuine uncertainty',mcol:'rgba(60,200,130,.9)',bc:'rgba(70,120,210,.18)'},
@@ -1102,7 +1119,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
       ctx.fillStyle=row.bc;ctx.beginPath();ctx.roundRect(30,ry,tw,Math.min(80,Math.floor((h-ty-130)/2)-4),6);ctx.fill();
       let cx2=30;
       const cells=[row.lbl,row.int,row.exp];
-      const cellC=['rgba(215,225,255,.9)','rgba(100,150,230,.88)','rgba(220,100,100,.9)'];
+      const cellC=['rgba(14,20,50,.9)','rgba(100,150,230,.88)','rgba(220,100,100,.9)'];
       cells.forEach((cell,ci)=>{
         const cw=tw*cols[ci];
         ctx.fillStyle=cellC[ci];ctx.font=ci===0?'bold 10px sans-serif':'10px sans-serif';ctx.textAlign='center';
@@ -1115,9 +1132,9 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     });
     const bot=ty+26+rows.length*Math.min(82,Math.floor((h-ty-130)/2))+12;
     const apF=eO(Math.max((p-.6)/.4,0));ctx.globalAlpha=ap*apF;
-    ctx.fillStyle='rgba(220,195,80,.95)';ctx.font='bold 14px Georgia';ctx.textAlign='center';
+    ctx.fillStyle='rgba(130,80,0,.95)';ctx.font='bold 14px Georgia';ctx.textAlign='center';
     ctx.fillText('"The model knows. It just won\'t say so."',w/2,bot);
-    ctx.fillStyle='rgba(180,195,220,.78)';ctx.font='11px sans-serif';
+    ctx.fillStyle='rgba(40,60,100,.78)';ctx.font='11px sans-serif';
     ctx.fillText('EV-NVAS: 0.718  vs  NVAS: 0.690  (Δ=+0.029, p<10⁻¹³,  19 of 24 models above diagonal)',w/2,bot+22);
     ctx.globalAlpha=1;
   }
@@ -1129,7 +1146,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     ctx.clearRect(0,0,w,h);
     if(!revealed)return;
     t+=1/60;
-    let elapsed=t%TOTAL,ph=0,phT=0;
+    let elapsed=(t+tOffset)%TOTAL,ph=0,phT=0;
     for(let i=0;i<DUR.length;i++){
       if(elapsed<DUR[i]){ph=i;phT=elapsed/DUR[i];break;}
       elapsed-=DUR[i];
@@ -1138,7 +1155,7 @@ document.querySelectorAll('.fi').forEach(el=>io.observe(el));
     const dotR=4,dotY=h-10;
     PHASES.forEach((_,i)=>{
       ctx.beginPath();ctx.arc(w/2+(i-4)*14,dotY,dotR,0,6.28);
-      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(140,150,180,.3)';ctx.fill();
+      ctx.fillStyle=i===ph?'rgba(200,175,40,.85)':'rgba(0,0,0,.2)';ctx.fill();
     });
     PHASES[ph](phT,w,h);
   }

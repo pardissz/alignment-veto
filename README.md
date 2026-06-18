@@ -48,20 +48,7 @@ The gate is inequitable: the **safety tax reaches 37.6%**, with a **19.8% alignm
 
 ## Two Failure Modes
 
-```
-                  High Refusal Rate
-                        ▲
-         SUPPRESSION    │    
-         FAILURES       │    
-         (T3-dominant)  │  model refuses BUT
-         ─ ─ ─ ─ ─ ─ ─ ┼ ─ ─ ─ ─ ─ ─ ─ ─
-                        │   internal logits ≈ human
-         REPRESENTATIONAL│
-         BIAS FAILURES  │
-         (gender eq.)   │    
-                        └──────────────────▶
-                           High NVAS when answered
-```
+
 
 | Failure Mode | Root Cause | Fix |
 |---|---|---|
@@ -201,14 +188,6 @@ ds = load_dataset("PardisSzah/alignment-veto-responses")
 
 ## Citation
 
-```bibtex
-@article{zahraei2026alignmentveto,
-  title     = {The Alignment Veto: How Safety Training Suppresses Cultural Knowledge in LLMs},
-  author    = {Zahraei, Pardis Sadat and Tur, Gokhan and Hakkani-T\"{u}r, Dilek and Asgari, Ehsaneddin},
-  journal   = {arXiv preprint},
-  year      = {2026}
-}
-```
 
 ---
 
